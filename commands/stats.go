@@ -55,10 +55,10 @@ func (pkg *Package) String() string {
 	return fmt.Sprintf("%s:%s#%s", pkg.Ref, pkg.PackageId, pkg.Revision)
 }
 
-func (pkg *Package) rtPath() string {
-	str := []string{pkg.Ref.rtPath(), "package", pkg.PackageId, pkg.Revision} 
-	return strings.Join(str, "/")
-}
+//func (pkg *Package) rtPath() string {
+//	str := []string{pkg.Ref.rtPath(), "package", pkg.PackageId, pkg.Revision} 
+//	return strings.Join(str, "/")
+//}
 
 func GetStatsCommand() components.Command {
 	return components.Command{
