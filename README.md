@@ -1,21 +1,18 @@
-# hello-frog
+# jcli-conan-center
 
 ## About this plugin
-This plugin is a template and a functioning example for a basic JFrog CLI plugin. 
-This README shows the expected structure of your plugin's README.
+This is a JFrog CLI plugin to manage Conan repositories. Some of its commands
+expect to find properties associated to packages as of those in Conan Center.
 
 ## Installation with JFrog CLI
 Installing the latest version:
 
-`$ jfrog plugin install hello-frog`
+`$ jfrog plugin install conan-center`
 
 Installing a specific version:
 
-`$ jfrog plugin install hello-frog@version`
+`$ jfrog plugin install conan-center@version`
 
-Uninstalling a plugin
-
-`$ jfrog plugin uninstall hello-frog`
 
 ## Usage
 ### Commands
