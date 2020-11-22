@@ -41,7 +41,7 @@ func (ref *Reference) rtPath() string {
 	if len(channel) == 0 {
 		channel = "_"
 	}
-	str := []string{ref.User, ref.Name, ref.Version, ref.Channel, ref.Revision} 
+	str := []string{user, ref.Name, ref.Version, channel, ref.Revision} 
 	return fmt.Sprintf(strings.Join(str, "/"))
 }
 
@@ -132,7 +132,6 @@ func searchReferences(repository string, rtDetails *config.ArtifactoryDetails) (
 func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref Reference) ([]Package, error) {
 	startsWith := repository + "/" + ref.rtPath() + "/package"
 	specFile := spec.NewBuilder().Pattern(startsWith + "/*/*/conaninfo.txt").IncludeDirs(false).BuildSpec()
-	fmt.Println(specFile)
 	
 	pkgPattern := regexp.MustCompile("\\/(?P<pkgId>[a-z0-9]*)\\/(?P<pkgRev>[a-z0-9]+)\\/conaninfo.txt")
 
@@ -146,7 +145,6 @@ func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 
 	packages := []Package{}
 	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
-		fmt.Println(searchResult.Path)
 		m := pkgPattern.FindStringSubmatch(strings.TrimPrefix(searchResult.Path, startsWith))
 		packages = append(packages, Package{Ref: ref, PackageId: m[1], Revision: m[2]})
 	}
