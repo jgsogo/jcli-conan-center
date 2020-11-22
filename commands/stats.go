@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands"
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands/generic"
@@ -29,6 +30,34 @@ func (ref *Reference) String() string {
 	} else {
 		return fmt.Sprintf("%s/%s#%s", ref.Name, ref.Version, ref.Revision)
 	}
+}
+
+func (ref *Reference) rtPath() string {
+	user := ref.User
+	if len(user) == 0 {
+		user = "_"
+	}
+	channel := ref.Channel
+	if len(channel) == 0 {
+		channel = "_"
+	}
+	str := []string{ref.User, ref.Name, ref.Version, ref.Channel, ref.Revision} 
+	return fmt.Sprintf(strings.Join(str, "/"))
+}
+
+type Package struct {
+	Ref Reference
+	PackageId string
+	Revision string
+}
+
+func (pkg *Package) String() string {
+	return fmt.Sprintf("%s:%s#%s", pkg.Ref, pkg.PackageId, pkg.Revision)
+}
+
+func (pkg *Package) rtPath() string {
+	str := []string{pkg.Ref.rtPath(), "package", pkg.PackageId, pkg.Revision} 
+	return fmt.Sprintf(strings.Join(str, "/"))
 }
 
 func GetStatsCommand() components.Command {
@@ -100,6 +129,30 @@ func searchReferences(repository string, rtDetails *config.ArtifactoryDetails) (
 	return references, nil
 }
 
+func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref Reference) ([]Package, error) {
+	startsWith := repository + "/" + ref.rtPath() + "/package"
+	specFile := spec.NewBuilder().Pattern(startsWith + "/*/*/conaninfo.txt").IncludeDirs(false).BuildSpec()
+	fmt.Println(specFile)
+	
+	pkgPattern := regexp.MustCompile("\\/(?P<pkgId>[a-z0-9]*)\\/(?P<pkgRev>[a-z0-9]+)\\/conaninfo.txt")
+
+	searchCmd := generic.NewSearchCommand()
+	searchCmd.SetRtDetails(rtDetails).SetSpec(specFile)
+	reader, err := searchCmd.Search()
+	if err != nil {
+		return nil, err
+	}
+	defer reader.Close()
+
+	packages := []Package{}
+	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
+		fmt.Println(searchResult.Path)
+		m := pkgPattern.FindStringSubmatch(strings.TrimPrefix(searchResult.Path, startsWith))
+		packages = append(packages, Package{Ref: ref, PackageId: m[1], Revision: m[2]})
+	}
+	return packages, nil
+}
+
 func statsCmd(c *components.Context) error {
 	if len(c.Arguments) != 1 {
 		return errors.New("Wrong number of arguments. Expected: 1, " + "Received: " + strconv.Itoa(len(c.Arguments)))
@@ -113,15 +166,13 @@ func statsCmd(c *components.Context) error {
 
 	// Check if repository exists
 	repository := c.Arguments[0]
-	log.Output("Inspect repository", repository)
+	log.Output("Work on repository", repository)
 	artAuth, err := rtDetails.CreateArtAuthConfig()
 	if err != nil {
-		log.Error("Error", err)
 		return err
 	}
 	err = utils.CheckIfRepoExists(repository, artAuth)
 	if err != nil {
-		log.Error("Error2", err)
 		return err
 	}
 
@@ -132,7 +183,11 @@ func statsCmd(c *components.Context) error {
 	}
 	log.Output("Found", len(references), "Conan references")
 	for _, ref := range references {
-		fmt.Println(ref.String())
+		packages, err := searchPackages(rtDetails, repository, ref)
+		if err != nil {
+			return err
+		}
+		log.Output(" -", ref.String(), ":", len(packages), "packages")
 	}
 
 	/*
