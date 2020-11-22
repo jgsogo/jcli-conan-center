@@ -103,7 +103,7 @@ func searchReferences(rtDetails *config.ArtifactoryDetails, repository string) (
 
 	specFile := spec.NewBuilder().Pattern(repository + "/**/conanfile.py").IncludeDirs(false).BuildSpec()
 	validConanChars := "[a-zA-Z0-9_][a-zA-Z0-9_\\+\\.-]"
-	referencePattern := regexp.MustCompile(repository + "\\/(?P<user>" + validConanChars + "*)\\/(?P<name>" + validConanChars + "+)\\/(?P<version>" + validConanChars + "+)\\/(?P<channel>" + validConanChars + "*)\\/(?P<revision>[a-z0-9]+)\\/export\\/conanfile\\.py")
+	referencePattern := regexp.MustCompile(repository + `\/(?P<user>` + validConanChars + `*)\/(?P<name>` + validConanChars + `+)\/(?P<version>` + validConanChars + `+)\/(?P<channel>` + validConanChars + `*)\/(?P<revision>[a-z0-9]+)\/export\/conanfile\.py`)
 
 	searchCmd := generic.NewSearchCommand()
 	searchCmd.SetRtDetails(rtDetails).SetSpec(specFile)
@@ -133,7 +133,7 @@ func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 	startsWith := repository + "/" + ref.rtPath() + "/package"
 	specFile := spec.NewBuilder().Pattern(startsWith + "/*/*/conaninfo.txt").IncludeDirs(false).BuildSpec()
 	
-	pkgPattern := regexp.MustCompile("\\/(?P<pkgId>[a-z0-9]*)\\/(?P<pkgRev>[a-z0-9]+)\\/conaninfo.txt")
+	pkgPattern := regexp.MustCompile(`\/(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)\/conaninfo.txt`)
 
 	searchCmd := generic.NewSearchCommand()
 	searchCmd.SetRtDetails(rtDetails).SetSpec(specFile)
