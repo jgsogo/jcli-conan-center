@@ -98,7 +98,7 @@ func getStatsArguments() []components.Argument {
 	}
 }
 
-func searchReferences(repository string, rtDetails *config.ArtifactoryDetails) ([]Reference, error) {
+func searchReferences(rtDetails *config.ArtifactoryDetails, repository string) ([]Reference, error) {
 	// Search all the 'conanfile.py' files inside the repository
 
 	specFile := spec.NewBuilder().Pattern(repository + "/**/conanfile.py").IncludeDirs(false).BuildSpec()
@@ -174,27 +174,24 @@ func statsCmd(c *components.Context) error {
 		return err
 	}
 
-	// Return references
-	references, err := searchReferences(repository, rtDetails)
+	// Search packages (first recipes and then packages)
+	packages := []Package{}
+	references, err := searchReferences(rtDetails, repository)
 	if err != nil {
 		return err
 	}
 	log.Output("Found", len(references), "Conan references")
 	for _, ref := range references {
-		packages, err := searchPackages(rtDetails, repository, ref)
+		refPackages, err := searchPackages(rtDetails, repository, ref)
 		if err != nil {
 			return err
 		}
-		log.Output(" -", ref.String(), ":", len(packages), "packages")
+		log.Output(" -", ref.String(), ":", len(refPackages), "packages")
+		packages = append(packages, refPackages...)
 	}
+	log.Output("Total found", len(packages),"packages")
 
-	/*
-		servicesManager, err := utils.CreateServiceManager(rtDetails, false)
-		if err != nil {
-			return err
-		}
-	*/
-
+	// Group packages
 
 
 	log.Output("Done!")
