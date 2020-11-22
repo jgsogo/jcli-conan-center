@@ -12,8 +12,8 @@ func main() {
 
 func getApp() components.App {
 	app := components.App{}
-	app.Name = "hello-frog"
-	app.Description = "Easily greet anyone."
+	app.Name = "conan-center"
+	app.Description = "Manage Conan repository."
 	app.Version = "v0.1.0"
 	app.Commands = getCommands()
 	return app
