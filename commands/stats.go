@@ -71,13 +71,11 @@ func getStatsArguments() []components.Argument {
 
 func searchReferences(repository string, rtDetails *config.ArtifactoryDetails) ([]Reference, error) {
 	// Search all the 'conanfile.py' files inside the repository
-	log.Output("Searching references in repository", repository)
-	references := []Reference{}
 
-	// Pattern to search
 	specFile := spec.NewBuilder().Pattern(repository + "/**/conanfile.py").IncludeDirs(false).BuildSpec()
 	validConanChars := "[a-zA-Z0-9_][a-zA-Z0-9_\\+\\.-]"
 	referencePattern := regexp.MustCompile(repository + "\\/(?P<user>" + validConanChars + "*)\\/(?P<name>" + validConanChars + "+)\\/(?P<version>" + validConanChars + "+)\\/(?P<channel>" + validConanChars + "*)\\/(?P<revision>[a-z0-9]+)\\/export\\/conanfile\\.py")
+
 	searchCmd := generic.NewSearchCommand()
 	searchCmd.SetRtDetails(rtDetails).SetSpec(specFile)
 	reader, err := searchCmd.Search()
@@ -85,6 +83,8 @@ func searchReferences(repository string, rtDetails *config.ArtifactoryDetails) (
 		return nil, err
 	}
 	defer reader.Close()
+
+	references := []Reference{}
 	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
 		m := referencePattern.FindStringSubmatch(searchResult.Path)
 		user := m[1]
