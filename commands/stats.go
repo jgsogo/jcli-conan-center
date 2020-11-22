@@ -42,7 +42,7 @@ func (ref *Reference) rtPath() string {
 		channel = "_"
 	}
 	str := []string{user, ref.Name, ref.Version, channel, ref.Revision} 
-	return fmt.Sprintf(strings.Join(str, "/"))
+	return strings.Join(str, "/")
 }
 
 type Package struct {
@@ -57,7 +57,7 @@ func (pkg *Package) String() string {
 
 func (pkg *Package) rtPath() string {
 	str := []string{pkg.Ref.rtPath(), "package", pkg.PackageId, pkg.Revision} 
-	return fmt.Sprintf(strings.Join(str, "/"))
+	return strings.Join(str, "/")
 }
 
 func GetStatsCommand() components.Command {
