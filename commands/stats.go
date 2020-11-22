@@ -99,10 +99,10 @@ func getStatsArguments() []components.Argument {
 }
 
 func searchReferences(rtDetails *config.ArtifactoryDetails, repository string) ([]Reference, error) {
-	// Search all the 'conanfile.py' files inside the repository
+	// Search all references (search for the 'conanfile.py')
 
 	specFile := spec.NewBuilder().Pattern(repository + "/**/conanfile.py").IncludeDirs(false).BuildSpec()
-	validConanChars := "[a-zA-Z0-9_][a-zA-Z0-9_\\+\\.-]"
+	validConanChars := `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
 	referencePattern := regexp.MustCompile(repository + `\/(?P<user>` + validConanChars + `*)\/(?P<name>` + validConanChars + `+)\/(?P<version>` + validConanChars + `+)\/(?P<channel>` + validConanChars + `*)\/(?P<revision>[a-z0-9]+)\/export\/conanfile\.py`)
 
 	searchCmd := generic.NewSearchCommand()
@@ -130,6 +130,8 @@ func searchReferences(rtDetails *config.ArtifactoryDetails, repository string) (
 }
 
 func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref Reference) ([]Package, error) {
+	// Search all packages (search for the 'conaninfo.txt')
+
 	startsWith := repository + "/" + ref.rtPath() + "/package"
 	specFile := spec.NewBuilder().Pattern(startsWith + "/*/*/conaninfo.txt").IncludeDirs(false).BuildSpec()
 	
