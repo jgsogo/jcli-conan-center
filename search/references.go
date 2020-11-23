@@ -12,8 +12,6 @@ import (
 	"github.com/jfrog/jfrog-cli-core/utils/config"
 )
 
-
-
 func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, onlyLatest bool) ([]types.Reference, error) {
 	// Search all references (search for the 'conanfile.py')
 
@@ -31,15 +29,14 @@ func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, o
 	references := make(map[string][]types.Reference)
 	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
 		m := referencePattern.FindStringSubmatch(searchResult.Path)
+		var reference types.Reference
 		user := m[1]
-		if user == "_" {
-			user = ""
-		}
 		channel := m[4]
-		if channel == "_" {
-			channel = ""
+		if user == types.FilesystemPlaceHolder {
+			reference = types.Reference{Name: m[2], Version: m[3], User: nil, Channel: nil, Revision: m[5]}
+		} else {
+			reference = types.Reference{Name: m[2], Version: m[3], User: &user, Channel: &channel, Revision: m[5]}
 		}
-		reference := types.Reference{Name: m[2], Version: m[3], User: user, Channel: channel, Revision: m[5]}
 		references[reference.ToString(false)] = append(references[reference.ToString(false)], reference)
 	}
 

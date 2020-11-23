@@ -41,15 +41,15 @@ func SearchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 	allPackages := make(map[string]map[string]map[string][]types.Package)
 	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
 		m := pkgPattern.FindStringSubmatch(strings.TrimPrefix(searchResult.Path, startsWith))
+		var reference types.Reference
 		user := m[1]
-		if user == "_" {
-			user = ""
-		}
 		channel := m[4]
-		if channel == "_" {
-			channel = ""
+		if user == types.FilesystemPlaceHolder {
+			reference = types.Reference{Name: m[2], Version: m[3], User: nil, Channel: nil, Revision: m[5]}
+		} else {
+			reference = types.Reference{Name: m[2], Version: m[3], User: &user, Channel: &channel, Revision: m[5]}
 		}
-		reference := types.Reference{Name: m[2], Version: m[3], User: user, Channel: channel, Revision: m[5]}
+
 		if ref != nil && *ref != reference {
 			panic("Mismatch references!")
 		}
