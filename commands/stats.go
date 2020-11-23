@@ -265,7 +265,6 @@ func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 		}
 		packages = append(packages, Package{Ref: reference, PackageId: m[6], Revision: m[7]})
 	}
-	
 	return packages, nil
 }
 
