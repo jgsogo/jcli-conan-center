@@ -1,4 +1,4 @@
-module github.com/jfrog/jfrog-cli-plugin-template
+module github.com/jgsogo/jcli-conan-center
 
 go 1.14
 

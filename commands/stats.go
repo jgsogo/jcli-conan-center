@@ -9,7 +9,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"time"
+
+	"github.com/jgsogo/jcli-conan-center/types"
 
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands"
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands/generic"
@@ -21,40 +22,8 @@ import (
 )
 
 const (
-	timeLayout      = "2006-01-02T15:04:05.999+0000"
 	validConanChars = `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
 )
-
-type RtTimestamp struct {
-	time.Time
-}
-
-func (ct *RtTimestamp) UnmarshalJSON(b []byte) (err error) {
-	// +info: https://stackoverflow.com/questions/25087960/json-unmarshal-time-that-isnt-in-rfc-3339-format
-	s := strings.Trim(string(b), "\"")
-	if s == "null" {
-		ct.Time = time.Time{}
-		return
-	}
-	ct.Time, err = time.Parse(timeLayout, s)
-	return
-}
-
-type RtRevisionsData struct {
-	Revision string
-	Time     RtTimestamp
-}
-
-type ByTime []RtRevisionsData
-
-func (a ByTime) Len() int           { return len(a) }
-func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByTime) Less(i, j int) bool { return a[i].Time.Before(a[j].Time.Time) }
-
-type RtIndexJSON struct {
-	//Reference string
-	Revisions []RtRevisionsData
-}
 
 type Reference struct {
 	Name     string
@@ -151,7 +120,7 @@ func getStatsArguments() []components.Argument {
 	}
 }
 
-func parseRevisions(rtDetails *config.ArtifactoryDetails, indexPath string) ([]RtRevisionsData, error) {
+func parseRevisions(rtDetails *config.ArtifactoryDetails, indexPath string) ([]types.RtRevisionsData, error) {
 	serviceManager, err := utils.CreateServiceManager(rtDetails, false)
 	if err != nil {
 		return nil, err
@@ -166,12 +135,12 @@ func parseRevisions(rtDetails *config.ArtifactoryDetails, indexPath string) ([]R
 	if err != nil {
 		return nil, err
 	}
-	var revisions RtIndexJSON
+	var revisions types.RtIndexJSON
 	err = json.Unmarshal(content, &revisions)
 	if err != nil {
 		return nil, err
 	}
-	sort.Sort(ByTime(revisions.Revisions))
+	sort.Sort(types.ByTime(revisions.Revisions))
 	return revisions.Revisions, nil
 }
 
@@ -353,7 +322,6 @@ func statsCmd(c *components.Context) error {
 		return err
 	}
 
-	
 	// Search packages (first recipes and then packages)
 	packages := []Package{}
 	references, err := searchReferences(rtDetails, repository, false)
@@ -370,7 +338,6 @@ func statsCmd(c *components.Context) error {
 		packages = append(packages, refPackages...)
 	}
 	log.Output("Total found", len(packages), "packages")
-	
 
 	// Search packages (all at once)
 	allPackages, err := searchPackages(rtDetails, repository, nil, false, false)
