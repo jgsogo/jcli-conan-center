@@ -1,15 +1,14 @@
 package commands
 
 import (
-	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/jgsogo/jcli-conan-center/types"
+	"github.com/jgsogo/jcli-conan-center/search"
 
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands"
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands/generic"
@@ -61,77 +60,6 @@ func getStatsArguments() []components.Argument {
 			Description: "Artifactory repository name",
 		},
 	}
-}
-
-func parseRevisions(rtDetails *config.ArtifactoryDetails, indexPath string) ([]types.RtRevisionsData, error) {
-	serviceManager, err := utils.CreateServiceManager(rtDetails, false)
-	if err != nil {
-		return nil, err
-	}
-	// https://github.com/jfrog/jfrog-cli-core/blob/8a53bb7180151cf4093f714f2bc7949029f48e18/artifactory/utils/docker/buildinfo.go
-	ioReaderCloser, err := serviceManager.ReadRemoteFile(indexPath)
-	if err != nil {
-		return nil, err
-	}
-	defer ioReaderCloser.Close()
-	content, err := ioutil.ReadAll(ioReaderCloser)
-	if err != nil {
-		return nil, err
-	}
-	var revisions types.RtIndexJSON
-	err = json.Unmarshal(content, &revisions)
-	if err != nil {
-		return nil, err
-	}
-	sort.Sort(types.ByTime(revisions.Revisions))
-	return revisions.Revisions, nil
-}
-
-func searchReferences(rtDetails *config.ArtifactoryDetails, repository string, onlyLatest bool) ([]types.Reference, error) {
-	// Search all references (search for the 'conanfile.py')
-
-	specFile := spec.NewBuilder().Pattern(repository + "/**/conanfile.py").IncludeDirs(false).BuildSpec()
-	referencePattern := regexp.MustCompile(repository + `\/(?P<user>` + validConanChars + `*)\/(?P<name>` + validConanChars + `+)\/(?P<version>` + validConanChars + `+)\/(?P<channel>` + validConanChars + `*)\/(?P<revision>[a-z0-9]+)\/export\/conanfile\.py`)
-
-	searchCmd := generic.NewSearchCommand()
-	searchCmd.SetRtDetails(rtDetails).SetSpec(specFile)
-	reader, err := searchCmd.Search()
-	if err != nil {
-		return nil, err
-	}
-	defer reader.Close()
-
-	references := make(map[string][]types.Reference)
-	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
-		m := referencePattern.FindStringSubmatch(searchResult.Path)
-		user := m[1]
-		if user == "_" {
-			user = ""
-		}
-		channel := m[4]
-		if channel == "_" {
-			channel = ""
-		}
-		reference := types.Reference{Name: m[2], Version: m[3], User: user, Channel: channel, Revision: m[5]}
-		references[reference.ToString(false)] = append(references[reference.ToString(false)], reference)
-	}
-
-	// Filter duplicated references using 'index.json' (if onlyLatest)
-	retReferences := []types.Reference{}
-	for _, element := range references {
-		if onlyLatest && len(element) > 1 {
-			rtRevisions, err := parseRevisions(rtDetails, repository+"/"+element[0].RtPath(false)+"/index.json")
-			if err != nil {
-				return nil, err
-			}
-			latestRevision := rtRevisions[len(rtRevisions)-1]
-			i := sort.Search(len(element), func(i int) bool { return latestRevision.Revision == element[i].Revision })
-			retReferences = append(retReferences, element[i])
-		} else {
-			retReferences = append(retReferences, element...)
-		}
-	}
-	return retReferences, nil
 }
 
 func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref *types.Reference, onlyLatestRecipe bool, onlyLatestPackage bool) ([]types.Package, error) {
@@ -192,7 +120,7 @@ func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 	filteredPackages := make(map[string]map[string][]types.Package)
 	for key, element := range allPackages {
 		if onlyLatestRecipe && len(element) > 1 {
-			rtRevisions, err := parseRevisions(rtDetails, repository+"/"+key+"/index.json")
+			rtRevisions, err := search.ParseRevisions(rtDetails, repository+"/"+key+"/index.json")
 			if err != nil {
 				return nil, err
 			}
@@ -225,7 +153,7 @@ func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 	for key, element := range filteredPackages {
 		if onlyLatestPackage && len(element) > 1 {
 			for keyId, elementId := range element {
-				rtRevisions, err := parseRevisions(rtDetails, repository+"/"+key+"/package/"+keyId+"/index.json")
+				rtRevisions, err := search.ParseRevisions(rtDetails, repository+"/"+key+"/package/"+keyId+"/index.json")
 				if err != nil {
 					return nil, err
 				}
@@ -267,7 +195,7 @@ func statsCmd(c *components.Context) error {
 
 	// Search packages (first recipes and then packages)
 	packages := []types.Package{}
-	references, err := searchReferences(rtDetails, repository, false)
+	references, err := search.SearchReferences(rtDetails, repository, false)
 	if err != nil {
 		return err
 	}
