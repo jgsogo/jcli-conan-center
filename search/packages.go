@@ -76,7 +76,6 @@ func SearchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 				return nil, err
 			}
 			latestRevision := rtRevisions[len(rtRevisions)-1]
-			//i := sort.Search(len(element), func(i int) bool { return latestRevision.Revision == element[i].Revision })
 			for k, v := range element[latestRevision.Revision] {
 				inner, ok := filteredPackages[key+"/"+latestRevision.Revision]
 				if !ok {
