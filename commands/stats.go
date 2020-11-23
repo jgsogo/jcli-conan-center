@@ -13,10 +13,6 @@ import (
 	"github.com/jfrog/jfrog-client-go/utils/log"
 )
 
-const (
-	validConanChars = `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
-)
-
 func GetStatsCommand() components.Command {
 	return components.Command{
 		Name:        "stats",
