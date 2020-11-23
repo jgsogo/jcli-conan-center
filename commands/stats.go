@@ -6,6 +6,10 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"io/ioutil"
+	"encoding/json"
+	"time"
+	"sort"
 
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands"
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands/generic"
@@ -16,6 +20,41 @@ import (
 	"github.com/jfrog/jfrog-client-go/utils/log"
 )
 
+const (
+	timeLayout = "2006-01-02T15:04:05.999+0000"
+)
+
+type RtTimestamp struct {
+    time.Time
+}
+
+func (ct *RtTimestamp) UnmarshalJSON(b []byte) (err error) {
+	// +info: https://stackoverflow.com/questions/25087960/json-unmarshal-time-that-isnt-in-rfc-3339-format
+    s := strings.Trim(string(b), "\"")
+    if s == "null" {
+       ct.Time = time.Time{}
+       return
+    }
+    ct.Time, err = time.Parse(timeLayout, s)
+    return
+}
+
+type RtRevisionsData struct {
+	Revision string
+	Time RtTimestamp
+}
+
+type ByTime []RtRevisionsData
+
+func (a ByTime) Len() int           { return len(a) }
+func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByTime) Less(i, j int) bool { return a[i].Time.Before(a[j].Time.Time) }
+
+type RtIndexJSON struct {
+	Reference string
+	Revisions []RtRevisionsData
+}
+
 type Reference struct {
 	Name     string
 	Version  string
@@ -24,15 +63,24 @@ type Reference struct {
 	Revision string
 }
 
-func (ref *Reference) String() string {
+func (ref *Reference) ToString(withRevision bool) string {
+	var ret string
 	if len(ref.User) > 0 {
-		return fmt.Sprintf("%s/%s@%s/%s#%s", ref.Name, ref.Version, ref.User, ref.Channel, ref.Revision)
+		ret = fmt.Sprintf("%s/%s@%s/%s", ref.Name, ref.Version, ref.User, ref.Channel)
 	} else {
-		return fmt.Sprintf("%s/%s#%s", ref.Name, ref.Version, ref.Revision)
+		ret = fmt.Sprintf("%s/%s", ref.Name, ref.Version)
 	}
+	if withRevision {
+		ret = ret + "#" + ref.Revision
+	}
+	return ret
 }
 
-func (ref *Reference) rtPath() string {
+func (ref *Reference) String() string {
+	return ref.ToString(true)
+}
+
+func (ref *Reference) rtPath(withRevision bool) string {
 	user := ref.User
 	if len(user) == 0 {
 		user = "_"
@@ -41,7 +89,11 @@ func (ref *Reference) rtPath() string {
 	if len(channel) == 0 {
 		channel = "_"
 	}
-	str := []string{user, ref.Name, ref.Version, channel, ref.Revision} 
+	str := []string{user, ref.Name, ref.Version, channel} 
+	if withRevision {
+		str = append(str, ref.Revision)
+	}
+	
 	return strings.Join(str, "/")
 }
 
@@ -98,7 +150,31 @@ func getStatsArguments() []components.Argument {
 	}
 }
 
-func searchReferences(rtDetails *config.ArtifactoryDetails, repository string) ([]Reference, error) {
+func parseRevisions(rtDetails *config.ArtifactoryDetails, indexPath string) ([]RtRevisionsData, error) {
+	serviceManager, err := utils.CreateServiceManager(rtDetails, false)
+	if err != nil {
+		return nil, err
+	}
+	// https://github.com/jfrog/jfrog-cli-core/blob/8a53bb7180151cf4093f714f2bc7949029f48e18/artifactory/utils/docker/buildinfo.go
+	ioReaderCloser, err := serviceManager.ReadRemoteFile(indexPath)
+	if err != nil {
+		return nil, err
+	}
+	defer ioReaderCloser.Close()
+	content, err := ioutil.ReadAll(ioReaderCloser)
+	if err != nil {
+		return nil, err
+	}
+	var revisions RtIndexJSON
+	err = json.Unmarshal(content, &revisions)
+	if err != nil {
+		return nil, err
+	}
+	sort.Sort(ByTime(revisions.Revisions))
+	return revisions.Revisions, nil
+}
+
+func searchReferences(rtDetails *config.ArtifactoryDetails, repository string, onlyLatest bool) ([]Reference, error) {
 	// Search all references (search for the 'conanfile.py')
 
 	specFile := spec.NewBuilder().Pattern(repository + "/**/conanfile.py").IncludeDirs(false).BuildSpec()
@@ -113,7 +189,7 @@ func searchReferences(rtDetails *config.ArtifactoryDetails, repository string) (
 	}
 	defer reader.Close()
 
-	references := []Reference{}
+	references := make(map[string][]Reference)
 	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
 		m := referencePattern.FindStringSubmatch(searchResult.Path)
 		user := m[1]
@@ -124,15 +200,32 @@ func searchReferences(rtDetails *config.ArtifactoryDetails, repository string) (
 		if channel == "_" {
 			channel = ""
 		}
-		references = append(references, Reference{Name: m[2], Version: m[3], User: user, Channel: channel, Revision: m[5]})
+		reference := Reference{Name: m[2], Version: m[3], User: user, Channel: channel, Revision: m[5]}
+		references[reference.ToString(false)] = append(references[reference.ToString(false)], reference)
 	}
-	return references, nil
+
+	// Filter duplicated references using 'index.json' (if onlyLatest)
+	retReferences := []Reference{}
+	for _, element := range references {
+		if onlyLatest && len(element) > 1 {
+			rtRevisions, err := parseRevisions(rtDetails, repository + "/" + element[0].rtPath(false) + "/index.json")
+			if err != nil {
+				return nil, err
+			}
+			latestRevision := rtRevisions[len(rtRevisions)-1]
+			i := sort.Search(len(element), func(i int) bool { return latestRevision.Revision == element[i].Revision })
+			retReferences = append(retReferences, element[i])
+		} else {
+			retReferences = append(retReferences, element...)
+		}
+	}
+	return retReferences, nil
 }
 
 func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref Reference) ([]Package, error) {
 	// Search all packages (search for the 'conaninfo.txt')
 
-	startsWith := repository + "/" + ref.rtPath() + "/package"
+	startsWith := repository + "/" + ref.rtPath(true) + "/package"
 	specFile := spec.NewBuilder().Pattern(startsWith + "/*/*/conaninfo.txt").IncludeDirs(false).BuildSpec()
 	
 	pkgPattern := regexp.MustCompile(`\/(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)\/conaninfo.txt`)
@@ -178,7 +271,7 @@ func statsCmd(c *components.Context) error {
 
 	// Search packages (first recipes and then packages)
 	packages := []Package{}
-	references, err := searchReferences(rtDetails, repository)
+	references, err := searchReferences(rtDetails, repository, true)
 	if err != nil {
 		return err
 	}
