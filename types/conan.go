@@ -29,7 +29,7 @@ type Reference struct {
 func (ref *Reference) ToString(withRevision bool) string {
 	var ret string
 	if ref.User != nil {
-		ret = fmt.Sprintf("%s/%s@%s/%s", ref.Name, ref.Version, ref.User, ref.Channel)
+		ret = fmt.Sprintf("%s/%s@%s/%s", ref.Name, ref.Version, *ref.User, *ref.Channel)
 	} else {
 		ret = fmt.Sprintf("%s/%s", ref.Name, ref.Version)
 	}
@@ -72,7 +72,7 @@ type Package struct {
 }
 
 func (pkg *Package) String() string {
-	return fmt.Sprintf("%s:%s#%s", pkg.Ref, pkg.PackageId, pkg.Revision)
+	return fmt.Sprintf("%s:%s#%s", pkg.Ref.String(), pkg.PackageId, pkg.Revision)
 }
 
 //func (pkg *Package) RtPath() string {
