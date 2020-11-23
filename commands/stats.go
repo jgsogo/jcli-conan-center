@@ -3,13 +3,13 @@ package commands
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
-	"time"
+
+	"github.com/jgsogo/jcli-conan-center/types"
 
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands"
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands/generic"
@@ -21,97 +21,9 @@ import (
 )
 
 const (
-	timeLayout      = "2006-01-02T15:04:05.999+0000"
 	validConanChars = `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
 )
 
-type RtTimestamp struct {
-	time.Time
-}
-
-func (ct *RtTimestamp) UnmarshalJSON(b []byte) (err error) {
-	// +info: https://stackoverflow.com/questions/25087960/json-unmarshal-time-that-isnt-in-rfc-3339-format
-	s := strings.Trim(string(b), "\"")
-	if s == "null" {
-		ct.Time = time.Time{}
-		return
-	}
-	ct.Time, err = time.Parse(timeLayout, s)
-	return
-}
-
-type RtRevisionsData struct {
-	Revision string
-	Time     RtTimestamp
-}
-
-type ByTime []RtRevisionsData
-
-func (a ByTime) Len() int           { return len(a) }
-func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByTime) Less(i, j int) bool { return a[i].Time.Before(a[j].Time.Time) }
-
-type RtIndexJSON struct {
-	//Reference string
-	Revisions []RtRevisionsData
-}
-
-type Reference struct {
-	Name     string
-	Version  string
-	User     string
-	Channel  string
-	Revision string
-}
-
-func (ref *Reference) ToString(withRevision bool) string {
-	var ret string
-	if len(ref.User) > 0 {
-		ret = fmt.Sprintf("%s/%s@%s/%s", ref.Name, ref.Version, ref.User, ref.Channel)
-	} else {
-		ret = fmt.Sprintf("%s/%s", ref.Name, ref.Version)
-	}
-	if withRevision {
-		ret = ret + "#" + ref.Revision
-	}
-	return ret
-}
-
-func (ref *Reference) String() string {
-	return ref.ToString(true)
-}
-
-func (ref *Reference) rtPath(withRevision bool) string {
-	user := ref.User
-	if len(user) == 0 {
-		user = "_"
-	}
-	channel := ref.Channel
-	if len(channel) == 0 {
-		channel = "_"
-	}
-	str := []string{user, ref.Name, ref.Version, channel}
-	if withRevision {
-		str = append(str, ref.Revision)
-	}
-
-	return strings.Join(str, "/")
-}
-
-type Package struct {
-	Ref       Reference
-	PackageId string
-	Revision  string
-}
-
-func (pkg *Package) String() string {
-	return fmt.Sprintf("%s:%s#%s", pkg.Ref, pkg.PackageId, pkg.Revision)
-}
-
-//func (pkg *Package) rtPath() string {
-//	str := []string{pkg.Ref.rtPath(), "package", pkg.PackageId, pkg.Revision}
-//	return strings.Join(str, "/")
-//}
 
 func GetStatsCommand() components.Command {
 	return components.Command{
@@ -151,7 +63,7 @@ func getStatsArguments() []components.Argument {
 	}
 }
 
-func parseRevisions(rtDetails *config.ArtifactoryDetails, indexPath string) ([]RtRevisionsData, error) {
+func parseRevisions(rtDetails *config.ArtifactoryDetails, indexPath string) ([]types.RtRevisionsData, error) {
 	serviceManager, err := utils.CreateServiceManager(rtDetails, false)
 	if err != nil {
 		return nil, err
@@ -166,16 +78,16 @@ func parseRevisions(rtDetails *config.ArtifactoryDetails, indexPath string) ([]R
 	if err != nil {
 		return nil, err
 	}
-	var revisions RtIndexJSON
+	var revisions types.RtIndexJSON
 	err = json.Unmarshal(content, &revisions)
 	if err != nil {
 		return nil, err
 	}
-	sort.Sort(ByTime(revisions.Revisions))
+	sort.Sort(types.ByTime(revisions.Revisions))
 	return revisions.Revisions, nil
 }
 
-func searchReferences(rtDetails *config.ArtifactoryDetails, repository string, onlyLatest bool) ([]Reference, error) {
+func searchReferences(rtDetails *config.ArtifactoryDetails, repository string, onlyLatest bool) ([]types.Reference, error) {
 	// Search all references (search for the 'conanfile.py')
 
 	specFile := spec.NewBuilder().Pattern(repository + "/**/conanfile.py").IncludeDirs(false).BuildSpec()
@@ -189,7 +101,7 @@ func searchReferences(rtDetails *config.ArtifactoryDetails, repository string, o
 	}
 	defer reader.Close()
 
-	references := make(map[string][]Reference)
+	references := make(map[string][]types.Reference)
 	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
 		m := referencePattern.FindStringSubmatch(searchResult.Path)
 		user := m[1]
@@ -200,15 +112,15 @@ func searchReferences(rtDetails *config.ArtifactoryDetails, repository string, o
 		if channel == "_" {
 			channel = ""
 		}
-		reference := Reference{Name: m[2], Version: m[3], User: user, Channel: channel, Revision: m[5]}
+		reference := types.Reference{Name: m[2], Version: m[3], User: user, Channel: channel, Revision: m[5]}
 		references[reference.ToString(false)] = append(references[reference.ToString(false)], reference)
 	}
 
 	// Filter duplicated references using 'index.json' (if onlyLatest)
-	retReferences := []Reference{}
+	retReferences := []types.Reference{}
 	for _, element := range references {
 		if onlyLatest && len(element) > 1 {
-			rtRevisions, err := parseRevisions(rtDetails, repository+"/"+element[0].rtPath(false)+"/index.json")
+			rtRevisions, err := parseRevisions(rtDetails, repository+"/"+element[0].RtPath(false)+"/index.json")
 			if err != nil {
 				return nil, err
 			}
@@ -222,7 +134,7 @@ func searchReferences(rtDetails *config.ArtifactoryDetails, repository string, o
 	return retReferences, nil
 }
 
-func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref *Reference, onlyLatestRecipe bool, onlyLatestPackage bool) ([]Package, error) {
+func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref *types.Reference, onlyLatestRecipe bool, onlyLatestPackage bool) ([]types.Package, error) {
 	// Search all packages (search for the 'conaninfo.txt')
 	if ref != nil && onlyLatestRecipe {
 		panic("Incompatible input arguments, do not request to filter by latest recipe if a reference is provided")
@@ -230,7 +142,7 @@ func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 
 	startsWith := repository + "/"
 	if ref != nil {
-		startsWith = startsWith + ref.rtPath(true)
+		startsWith = startsWith + ref.RtPath(true)
 	} else {
 		startsWith = startsWith + "*/*/*/*"
 	}
@@ -247,7 +159,7 @@ func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 	defer reader.Close()
 
 	//
-	allPackages := make(map[string]map[string]map[string][]Package)
+	allPackages := make(map[string]map[string]map[string][]types.Package)
 	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
 		m := pkgPattern.FindStringSubmatch(strings.TrimPrefix(searchResult.Path, startsWith))
 		user := m[1]
@@ -258,26 +170,26 @@ func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 		if channel == "_" {
 			channel = ""
 		}
-		reference := Reference{Name: m[2], Version: m[3], User: user, Channel: channel, Revision: m[5]}
+		reference := types.Reference{Name: m[2], Version: m[3], User: user, Channel: channel, Revision: m[5]}
 		if ref != nil && *ref != reference {
 			panic("Mismatch references!")
 		}
-		conanPackage := Package{Ref: reference, PackageId: m[6], Revision: m[7]}
-		inner, ok := allPackages[conanPackage.Ref.rtPath(false)]
+		conanPackage := types.Package{Ref: reference, PackageId: m[6], Revision: m[7]}
+		inner, ok := allPackages[conanPackage.Ref.RtPath(false)]
 		if !ok {
-			inner = make(map[string]map[string][]Package)
-			allPackages[conanPackage.Ref.rtPath(false)] = inner
+			inner = make(map[string]map[string][]types.Package)
+			allPackages[conanPackage.Ref.RtPath(false)] = inner
 		}
 		inner2, ok := inner[conanPackage.Ref.Revision]
 		if !ok {
-			inner2 = make(map[string][]Package)
+			inner2 = make(map[string][]types.Package)
 			inner[conanPackage.Ref.Revision] = inner2
 		}
 		inner2[conanPackage.PackageId] = append(inner2[conanPackage.PackageId], conanPackage)
 	}
 
 	// Filter recipes using 'index.json' (if onlyLatestRecipe)
-	filteredPackages := make(map[string]map[string][]Package)
+	filteredPackages := make(map[string]map[string][]types.Package)
 	for key, element := range allPackages {
 		if onlyLatestRecipe && len(element) > 1 {
 			rtRevisions, err := parseRevisions(rtDetails, repository+"/"+key+"/index.json")
@@ -289,7 +201,7 @@ func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 			for k, v := range element[latestRevision.Revision] {
 				inner, ok := filteredPackages[key+"/"+latestRevision.Revision]
 				if !ok {
-					inner = make(map[string][]Package)
+					inner = make(map[string][]types.Package)
 					filteredPackages[key+"/"+latestRevision.Revision] = inner
 				}
 				inner[k] = v
@@ -299,7 +211,7 @@ func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 				for k, v := range elements {
 					inner, ok := filteredPackages[key+"/"+rrev]
 					if !ok {
-						inner = make(map[string][]Package)
+						inner = make(map[string][]types.Package)
 						filteredPackages[key+"/"+rrev] = inner
 					}
 					inner[k] = v
@@ -309,7 +221,7 @@ func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 	}
 
 	// Filter packages using 'index.json' (if onlyLatestPackages)
-	packages := []Package{}
+	packages := []types.Package{}
 	for key, element := range filteredPackages {
 		if onlyLatestPackage && len(element) > 1 {
 			for keyId, elementId := range element {
@@ -353,9 +265,8 @@ func statsCmd(c *components.Context) error {
 		return err
 	}
 
-	
 	// Search packages (first recipes and then packages)
-	packages := []Package{}
+	packages := []types.Package{}
 	references, err := searchReferences(rtDetails, repository, false)
 	if err != nil {
 		return err
@@ -370,7 +281,6 @@ func statsCmd(c *components.Context) error {
 		packages = append(packages, refPackages...)
 	}
 	log.Output("Total found", len(packages), "packages")
-	
 
 	// Search packages (all at once)
 	allPackages, err := searchPackages(rtDetails, repository, nil, false, false)
