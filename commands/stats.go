@@ -1,15 +1,15 @@
 package commands
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
-	"io/ioutil"
-	"encoding/json"
 	"time"
-	"sort"
 
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands"
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands/generic"
@@ -21,28 +21,28 @@ import (
 )
 
 const (
-	timeLayout = "2006-01-02T15:04:05.999+0000"
+	timeLayout      = "2006-01-02T15:04:05.999+0000"
 	validConanChars = `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
 )
 
 type RtTimestamp struct {
-    time.Time
+	time.Time
 }
 
 func (ct *RtTimestamp) UnmarshalJSON(b []byte) (err error) {
 	// +info: https://stackoverflow.com/questions/25087960/json-unmarshal-time-that-isnt-in-rfc-3339-format
-    s := strings.Trim(string(b), "\"")
-    if s == "null" {
-       ct.Time = time.Time{}
-       return
-    }
-    ct.Time, err = time.Parse(timeLayout, s)
-    return
+	s := strings.Trim(string(b), "\"")
+	if s == "null" {
+		ct.Time = time.Time{}
+		return
+	}
+	ct.Time, err = time.Parse(timeLayout, s)
+	return
 }
 
 type RtRevisionsData struct {
 	Revision string
-	Time RtTimestamp
+	Time     RtTimestamp
 }
 
 type ByTime []RtRevisionsData
@@ -90,18 +90,18 @@ func (ref *Reference) rtPath(withRevision bool) string {
 	if len(channel) == 0 {
 		channel = "_"
 	}
-	str := []string{user, ref.Name, ref.Version, channel} 
+	str := []string{user, ref.Name, ref.Version, channel}
 	if withRevision {
 		str = append(str, ref.Revision)
 	}
-	
+
 	return strings.Join(str, "/")
 }
 
 type Package struct {
-	Ref Reference
+	Ref       Reference
 	PackageId string
-	Revision string
+	Revision  string
 }
 
 func (pkg *Package) String() string {
@@ -109,7 +109,7 @@ func (pkg *Package) String() string {
 }
 
 //func (pkg *Package) rtPath() string {
-//	str := []string{pkg.Ref.rtPath(), "package", pkg.PackageId, pkg.Revision} 
+//	str := []string{pkg.Ref.rtPath(), "package", pkg.PackageId, pkg.Revision}
 //	return strings.Join(str, "/")
 //}
 
@@ -208,7 +208,7 @@ func searchReferences(rtDetails *config.ArtifactoryDetails, repository string, o
 	retReferences := []Reference{}
 	for _, element := range references {
 		if onlyLatest && len(element) > 1 {
-			rtRevisions, err := parseRevisions(rtDetails, repository + "/" + element[0].rtPath(false) + "/index.json")
+			rtRevisions, err := parseRevisions(rtDetails, repository+"/"+element[0].rtPath(false)+"/index.json")
 			if err != nil {
 				return nil, err
 			}
@@ -222,21 +222,19 @@ func searchReferences(rtDetails *config.ArtifactoryDetails, repository string, o
 	return retReferences, nil
 }
 
-func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref *Reference, onlyLatest bool) ([]Package, error) {
+func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref *Reference, onlyLatestRecipe bool, onlyLatestPackage bool) ([]Package, error) {
 	// Search all packages (search for the 'conaninfo.txt')
-	startsWith := repository + "/"
-	//pkgPatternStr := repository + `\/`
+	if ref != nil && onlyLatestRecipe {
+		panic("Incompatible input arguments, do not request to filter by latest recipe if a reference is provided")
+	}
 
+	startsWith := repository + "/"
 	if ref != nil {
 		startsWith = startsWith + ref.rtPath(true)
-	//	pkgPatternStr = pkgPatternStr + strings.ReplaceAll(ref.rtPath(true), "/", `\/`)
 	} else {
 		startsWith = startsWith + "*/*/*/*"
-	//	pkgPatternStr = `(?P<user>` + validConanChars + `*)\/(?P<name>` + validConanChars + `+)\/(?P<version>` + validConanChars + `+)\/(?P<channel>` + validConanChars + `*)\/(?P<revision>[a-z0-9]+)`
 	}
 	startsWith = startsWith + "/package/*/*/conaninfo.txt"
-	//pkgPatternStr = pkgPatternStr + `\/package\/(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)\/conaninfo.txt`
-
 	specFile := spec.NewBuilder().Pattern(startsWith).IncludeDirs(false).BuildSpec()
 	pkgPattern := regexp.MustCompile(repository + `\/(?P<user>` + validConanChars + `*)\/(?P<name>` + validConanChars + `+)\/(?P<version>` + validConanChars + `+)\/(?P<channel>` + validConanChars + `*)\/(?P<revision>[a-z0-9]+)\/package\/(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)\/conaninfo.txt`)
 
@@ -248,7 +246,8 @@ func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 	}
 	defer reader.Close()
 
-	packages := []Package{}
+	//
+	allPackages := make(map[string]map[string]map[string][]Package)
 	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
 		m := pkgPattern.FindStringSubmatch(strings.TrimPrefix(searchResult.Path, startsWith))
 		user := m[1]
@@ -263,7 +262,70 @@ func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 		if ref != nil && *ref != reference {
 			panic("Mismatch references!")
 		}
-		packages = append(packages, Package{Ref: reference, PackageId: m[6], Revision: m[7]})
+		conanPackage := Package{Ref: reference, PackageId: m[6], Revision: m[7]}
+		inner, ok := allPackages[conanPackage.Ref.rtPath(false)]
+		if !ok {
+			inner = make(map[string]map[string][]Package)
+			allPackages[conanPackage.Ref.rtPath(false)] = inner
+		}
+		inner2, ok := inner[conanPackage.Ref.Revision]
+		if !ok {
+			inner2 = make(map[string][]Package)
+			inner[conanPackage.Ref.Revision] = inner2
+		}
+		inner2[conanPackage.PackageId] = append(inner2[conanPackage.PackageId], conanPackage)
+	}
+
+	// Filter recipes using 'index.json' (if onlyLatestRecipe)
+	filteredPackages := make(map[string]map[string][]Package)
+	for key, element := range allPackages {
+		if onlyLatestRecipe && len(element) > 1 {
+			rtRevisions, err := parseRevisions(rtDetails, repository+"/"+key+"/index.json")
+			if err != nil {
+				return nil, err
+			}
+			latestRevision := rtRevisions[len(rtRevisions)-1]
+			//i := sort.Search(len(element), func(i int) bool { return latestRevision.Revision == element[i].Revision })
+			for k, v := range element[latestRevision.Revision] {
+				inner, ok := filteredPackages[key+"/"+latestRevision.Revision]
+				if !ok {
+					inner = make(map[string][]Package)
+					filteredPackages[key+"/"+latestRevision.Revision] = inner
+				}
+				inner[k] = v
+			}
+		} else {
+			for rrev, elements := range element {
+				for k, v := range elements {
+					inner, ok := filteredPackages[key+"/"+rrev]
+					if !ok {
+						inner = make(map[string][]Package)
+						filteredPackages[key+"/"+rrev] = inner
+					}
+					inner[k] = v
+				}
+			}
+		}
+	}
+
+	// Filter packages using 'index.json' (if onlyLatestPackages)
+	packages := []Package{}
+	for key, element := range filteredPackages {
+		if onlyLatestPackage && len(element) > 1 {
+			for keyId, elementId := range element {
+				rtRevisions, err := parseRevisions(rtDetails, repository+"/"+key+"/package/"+keyId+"/index.json")
+				if err != nil {
+					return nil, err
+				}
+				latestRevision := rtRevisions[len(rtRevisions)-1]
+				i := sort.Search(len(elementId), func(i int) bool { return latestRevision.Revision == elementId[i].Revision })
+				packages = append(packages, elementId[i])
+			}
+		} else {
+			for _, elementId := range element {
+				packages = append(packages, elementId...)
+			}
+		}
 	}
 	return packages, nil
 }
@@ -291,6 +353,7 @@ func statsCmd(c *components.Context) error {
 		return err
 	}
 
+	/*
 	// Search packages (first recipes and then packages)
 	packages := []Package{}
 	references, err := searchReferences(rtDetails, repository, false)
@@ -299,17 +362,22 @@ func statsCmd(c *components.Context) error {
 	}
 	log.Output("Found", len(references), "Conan references")
 	for _, ref := range references {
-		refPackages, err := searchPackages(rtDetails, repository, &ref, true)
+		refPackages, err := searchPackages(rtDetails, repository, &ref, false, false)
 		if err != nil {
 			return err
 		}
 		log.Output(" -", ref.String(), ":", len(refPackages), "packages")
 		packages = append(packages, refPackages...)
 	}
-	log.Output("Total found", len(packages),"packages")
+	log.Output("Total found", len(packages), "packages")
+	*/
 
-	// Group packages
-
+	// Search packages (all at once)
+	allPackages, err := searchPackages(rtDetails, repository, nil, false, false)
+	if err != nil {
+		return err
+	}
+	log.Output("Total found", len(allPackages), "packages")
 
 	log.Output("Done!")
 	return nil
