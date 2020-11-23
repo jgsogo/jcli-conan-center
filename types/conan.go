@@ -5,6 +5,10 @@ import (
 	"strings"
 )
 
+const (
+	ValidConanChars = `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
+)
+
 type Reference struct {
 	Name     string
 	Version  string

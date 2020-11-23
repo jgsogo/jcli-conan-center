@@ -12,15 +12,13 @@ import (
 	"github.com/jfrog/jfrog-cli-core/utils/config"
 )
 
-const (
-	validConanChars = `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
-)
+
 
 func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, onlyLatest bool) ([]types.Reference, error) {
 	// Search all references (search for the 'conanfile.py')
 
 	specFile := spec.NewBuilder().Pattern(repository + "/**/conanfile.py").IncludeDirs(false).BuildSpec()
-	referencePattern := regexp.MustCompile(repository + `\/(?P<user>` + validConanChars + `*)\/(?P<name>` + validConanChars + `+)\/(?P<version>` + validConanChars + `+)\/(?P<channel>` + validConanChars + `*)\/(?P<revision>[a-z0-9]+)\/export\/conanfile\.py`)
+	referencePattern := regexp.MustCompile(repository + `\/(?P<user>` + types.ValidConanChars + `*)\/(?P<name>` + types.ValidConanChars + `+)\/(?P<version>` + types.ValidConanChars + `+)\/(?P<channel>` + types.ValidConanChars + `*)\/(?P<revision>[a-z0-9]+)\/export\/conanfile\.py`)
 
 	searchCmd := generic.NewSearchCommand()
 	searchCmd.SetRtDetails(rtDetails).SetSpec(specFile)
