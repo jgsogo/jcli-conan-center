@@ -1,9 +1,9 @@
 package search
 
 import (
+	"fmt"
 	"regexp"
 	"sort"
-	"strings"
 
 	"github.com/jgsogo/jcli-conan-center/types"
 
@@ -11,22 +11,20 @@ import (
 	"github.com/jfrog/jfrog-cli-core/artifactory/spec"
 	"github.com/jfrog/jfrog-cli-core/artifactory/utils"
 	"github.com/jfrog/jfrog-cli-core/utils/config"
+	"github.com/jfrog/jfrog-client-go/utils/log"
 )
 
-func SearchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref *types.Reference, onlyLatestRecipe bool, onlyLatestPackage bool) ([]types.Package, error) {
+func SearchPackages(rtDetails *config.ArtifactoryDetails, repository string, referenceName string, onlyLatestRecipe bool, onlyLatestPackage bool) ([]types.Package, error) {
 	// Search all packages (search for the 'conaninfo.txt')
-	if ref != nil && onlyLatestRecipe {
-		panic("Incompatible input arguments, do not request to filter by latest recipe if a reference is provided")
-	}
-
-	startsWith := repository + "/"
-	if ref != nil {
-		startsWith = startsWith + ref.RtPath(true)
+	specSearchPattern := repository + "/*/"
+	if len(referenceName) > 0 {
+		specSearchPattern = specSearchPattern + referenceName
 	} else {
-		startsWith = startsWith + "*/*/*/*"
+		specSearchPattern = specSearchPattern + "*"
 	}
-	startsWith = startsWith + "/package/*/*/conaninfo.txt"
-	specFile := spec.NewBuilder().Pattern(startsWith).IncludeDirs(false).BuildSpec()
+	specSearchPattern = specSearchPattern + "/*/*/package/*/*/conaninfo.txt"
+	log.Debug(fmt.Sprintf("Search packages using specPattern '%s'", specSearchPattern))
+	specFile := spec.NewBuilder().Pattern(specSearchPattern).IncludeDirs(false).BuildSpec()
 	pkgPattern := regexp.MustCompile(repository + `\/(?P<user>` + types.ValidConanChars + `*)\/(?P<name>` + types.ValidConanChars + `+)\/(?P<version>` + types.ValidConanChars + `+)\/(?P<channel>` + types.ValidConanChars + `*)\/(?P<revision>[a-z0-9]+)\/package\/(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)\/conaninfo.txt`)
 
 	searchCmd := generic.NewSearchCommand()
@@ -40,7 +38,7 @@ func SearchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 	//
 	allPackages := make(map[string]map[string]map[string][]types.Package)
 	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
-		m := pkgPattern.FindStringSubmatch(strings.TrimPrefix(searchResult.Path, startsWith))
+		m := pkgPattern.FindStringSubmatch(searchResult.Path)
 		var reference types.Reference
 		user := m[1]
 		channel := m[4]
@@ -50,7 +48,7 @@ func SearchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 			reference = types.Reference{Name: m[2], Version: m[3], User: &user, Channel: &channel, Revision: m[5]}
 		}
 
-		if ref != nil && *ref != reference {
+		if len(referenceName) > 0 && referenceName != reference.Name {
 			panic("Mismatch references!")
 		}
 		conanPackage := types.Package{Ref: reference, PackageId: m[6], Revision: m[7]}
