@@ -6,20 +6,29 @@ import (
 )
 
 const (
-	ValidConanChars = `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
+	ValidConanChars       = `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
+	FilesystemPlaceHolder = "_"
 )
 
 type Reference struct {
 	Name     string
 	Version  string
-	User     string
-	Channel  string
+	User     *string
+	Channel  *string
 	Revision string
 }
 
+//func MakeReference(name string, version string, revision string) Reference {
+//	return Reference{name, version, "_", "_", revision}
+//}
+
+//func MakeReference(name string, version string, user *string, channel *string, revision string) Reference {
+//	return Reference{name, version, user, channel, revision}
+//}
+
 func (ref *Reference) ToString(withRevision bool) string {
 	var ret string
-	if len(ref.User) > 0 {
+	if ref.User != nil {
 		ret = fmt.Sprintf("%s/%s@%s/%s", ref.Name, ref.Version, ref.User, ref.Channel)
 	} else {
 		ret = fmt.Sprintf("%s/%s", ref.Name, ref.Version)
@@ -35,19 +44,24 @@ func (ref *Reference) String() string {
 }
 
 func (ref *Reference) RtPath(withRevision bool) string {
-	user := ref.User
-	if len(user) == 0 {
-		user = "_"
+	var user string
+	if ref.User == nil {
+		user = FilesystemPlaceHolder
+	} else {
+		user = *ref.User
 	}
-	channel := ref.Channel
-	if len(channel) == 0 {
-		channel = "_"
+
+	var channel string
+	if ref.Channel == nil {
+		channel = FilesystemPlaceHolder
+	} else {
+		channel = *ref.Channel
 	}
+
 	str := []string{user, ref.Name, ref.Version, channel}
 	if withRevision {
 		str = append(str, ref.Revision)
 	}
-
 	return strings.Join(str, "/")
 }
 
