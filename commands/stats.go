@@ -353,7 +353,7 @@ func statsCmd(c *components.Context) error {
 		return err
 	}
 
-	/*
+	
 	// Search packages (first recipes and then packages)
 	packages := []Package{}
 	references, err := searchReferences(rtDetails, repository, false)
@@ -370,7 +370,7 @@ func statsCmd(c *components.Context) error {
 		packages = append(packages, refPackages...)
 	}
 	log.Output("Total found", len(packages), "packages")
-	*/
+	
 
 	// Search packages (all at once)
 	allPackages, err := searchPackages(rtDetails, repository, nil, false, false)
