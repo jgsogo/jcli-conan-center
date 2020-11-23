@@ -22,6 +22,7 @@ import (
 
 const (
 	timeLayout = "2006-01-02T15:04:05.999+0000"
+	validConanChars = `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
 )
 
 type RtTimestamp struct {
@@ -51,7 +52,7 @@ func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByTime) Less(i, j int) bool { return a[i].Time.Before(a[j].Time.Time) }
 
 type RtIndexJSON struct {
-	Reference string
+	//Reference string
 	Revisions []RtRevisionsData
 }
 
@@ -178,7 +179,6 @@ func searchReferences(rtDetails *config.ArtifactoryDetails, repository string, o
 	// Search all references (search for the 'conanfile.py')
 
 	specFile := spec.NewBuilder().Pattern(repository + "/**/conanfile.py").IncludeDirs(false).BuildSpec()
-	validConanChars := `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
 	referencePattern := regexp.MustCompile(repository + `\/(?P<user>` + validConanChars + `*)\/(?P<name>` + validConanChars + `+)\/(?P<version>` + validConanChars + `+)\/(?P<channel>` + validConanChars + `*)\/(?P<revision>[a-z0-9]+)\/export\/conanfile\.py`)
 
 	searchCmd := generic.NewSearchCommand()
@@ -222,13 +222,23 @@ func searchReferences(rtDetails *config.ArtifactoryDetails, repository string, o
 	return retReferences, nil
 }
 
-func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref Reference) ([]Package, error) {
+func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref *Reference, onlyLatest bool) ([]Package, error) {
 	// Search all packages (search for the 'conaninfo.txt')
+	startsWith := repository + "/"
+	//pkgPatternStr := repository + `\/`
 
-	startsWith := repository + "/" + ref.rtPath(true) + "/package"
-	specFile := spec.NewBuilder().Pattern(startsWith + "/*/*/conaninfo.txt").IncludeDirs(false).BuildSpec()
-	
-	pkgPattern := regexp.MustCompile(`\/(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)\/conaninfo.txt`)
+	if ref != nil {
+		startsWith = startsWith + ref.rtPath(true)
+	//	pkgPatternStr = pkgPatternStr + strings.ReplaceAll(ref.rtPath(true), "/", `\/`)
+	} else {
+		startsWith = startsWith + "*/*/*/*"
+	//	pkgPatternStr = `(?P<user>` + validConanChars + `*)\/(?P<name>` + validConanChars + `+)\/(?P<version>` + validConanChars + `+)\/(?P<channel>` + validConanChars + `*)\/(?P<revision>[a-z0-9]+)`
+	}
+	startsWith = startsWith + "/package/*/*/conaninfo.txt"
+	//pkgPatternStr = pkgPatternStr + `\/package\/(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)\/conaninfo.txt`
+
+	specFile := spec.NewBuilder().Pattern(startsWith).IncludeDirs(false).BuildSpec()
+	pkgPattern := regexp.MustCompile(repository + `\/(?P<user>` + validConanChars + `*)\/(?P<name>` + validConanChars + `+)\/(?P<version>` + validConanChars + `+)\/(?P<channel>` + validConanChars + `*)\/(?P<revision>[a-z0-9]+)\/package\/(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)\/conaninfo.txt`)
 
 	searchCmd := generic.NewSearchCommand()
 	searchCmd.SetRtDetails(rtDetails).SetSpec(specFile)
@@ -241,8 +251,21 @@ func searchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 	packages := []Package{}
 	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
 		m := pkgPattern.FindStringSubmatch(strings.TrimPrefix(searchResult.Path, startsWith))
-		packages = append(packages, Package{Ref: ref, PackageId: m[1], Revision: m[2]})
+		user := m[1]
+		if user == "_" {
+			user = ""
+		}
+		channel := m[4]
+		if channel == "_" {
+			channel = ""
+		}
+		reference := Reference{Name: m[2], Version: m[3], User: user, Channel: channel, Revision: m[5]}
+		if ref != nil && *ref != reference {
+			panic("Mismatch references!")
+		}
+		packages = append(packages, Package{Ref: reference, PackageId: m[6], Revision: m[7]})
 	}
+	
 	return packages, nil
 }
 
@@ -271,13 +294,13 @@ func statsCmd(c *components.Context) error {
 
 	// Search packages (first recipes and then packages)
 	packages := []Package{}
-	references, err := searchReferences(rtDetails, repository, true)
+	references, err := searchReferences(rtDetails, repository, false)
 	if err != nil {
 		return err
 	}
 	log.Output("Found", len(references), "Conan references")
 	for _, ref := range references {
-		refPackages, err := searchPackages(rtDetails, repository, ref)
+		refPackages, err := searchPackages(rtDetails, repository, &ref, true)
 		if err != nil {
 			return err
 		}
