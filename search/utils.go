@@ -5,18 +5,11 @@ import (
 	"io/ioutil"
 	"sort"
 
+	"github.com/jfrog/jfrog-client-go/artifactory"
 	"github.com/jgsogo/jcli-conan-center/types"
-
-	"github.com/jfrog/jfrog-cli-core/artifactory/utils"
-	"github.com/jfrog/jfrog-cli-core/utils/config"
 )
 
-func ParseRevisions(rtDetails *config.ArtifactoryDetails, indexPath string) ([]types.RtRevisionsData, error) {
-	serviceManager, err := utils.CreateServiceManager(rtDetails, false)
-	if err != nil {
-		return nil, err
-	}
-	// https://github.com/jfrog/jfrog-cli-core/blob/8a53bb7180151cf4093f714f2bc7949029f48e18/artifactory/utils/docker/buildinfo.go
+func ParseRevisions(serviceManager artifactory.ArtifactoryServicesManager, indexPath string) ([]types.RtRevisionsData, error) {
 	ioReaderCloser, err := serviceManager.ReadRemoteFile(indexPath)
 	if err != nil {
 		return nil, err

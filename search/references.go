@@ -15,6 +15,11 @@ import (
 )
 
 func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, referenceName string, onlyLatest bool) ([]types.Reference, error) {
+	serviceManager, err := utils.CreateServiceManager(rtDetails, false)
+	if err != nil {
+		return nil, err
+	}
+
 	// Search all references (search for the 'conanfile.py')
 	specSearchPattern := repository + "/*/"
 	if len(referenceName) > 0 {
@@ -53,7 +58,7 @@ func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, r
 	retReferences := []types.Reference{}
 	for _, element := range references {
 		if onlyLatest && len(element) > 1 {
-			rtRevisions, err := ParseRevisions(rtDetails, repository+"/"+element[0].RtPath(false)+"/index.json")
+			rtRevisions, err := ParseRevisions(serviceManager, repository+"/"+element[0].RtPath(false)+"/index.json")
 			if err != nil {
 				return nil, err
 			}
