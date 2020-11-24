@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strconv"
 
 	"github.com/jgsogo/jcli-conan-center/types"
 
-	"github.com/jfrog/jfrog-cli-core/artifactory/spec"
 	"github.com/jfrog/jfrog-cli-core/artifactory/utils"
 	"github.com/jfrog/jfrog-cli-core/utils/config"
+	"github.com/jfrog/jfrog-client-go/artifactory/services"
+	servicesUtils "github.com/jfrog/jfrog-client-go/artifactory/services/utils"
 	"github.com/jfrog/jfrog-client-go/utils/log"
 )
 
@@ -18,6 +20,7 @@ func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, r
 	if err != nil {
 		return nil, err
 	}
+	log.Info("Searching references...")
 
 	// Search all references (search for the 'conanfile.py')
 	specSearchPattern := repository + "/*/"
@@ -28,17 +31,21 @@ func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, r
 	}
 	specSearchPattern = specSearchPattern + "/*/*/conanfile.py"
 	log.Debug(fmt.Sprintf("Search references using specPattern '%s'", specSearchPattern))
-	specFile := *spec.NewBuilder().Pattern(specSearchPattern).IncludeDirs(false).BuildSpec()
-	referencePattern := regexp.MustCompile(repository + `\/(?P<user>` + types.ValidConanChars + `*)\/(?P<name>` + types.ValidConanChars + `+)\/(?P<version>` + types.ValidConanChars + `+)\/(?P<channel>` + types.ValidConanChars + `*)\/(?P<revision>[a-z0-9]+)\/export\/conanfile\.py`)
+	referencePattern := regexp.MustCompile(`(?P<user>` + types.ValidConanChars + `*)\/(?P<name>` + types.ValidConanChars + `+)\/(?P<version>` + types.ValidConanChars + `+)\/(?P<channel>` + types.ValidConanChars + `*)\/(?P<revision>[a-z0-9]+)\/export`)
 
-	reader, err := RunSearch(serviceManager, specFile)
+	params := services.NewSearchParams()
+	params.Pattern = specSearchPattern
+	params.Recursive = false
+	params.IncludeDirs = false
+
+	reader, err := RunSearch(serviceManager, params)
 	if err != nil {
 		return nil, err
 	}
 	defer reader.Close()
 
 	references := make(map[string][]types.Reference)
-	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
+	for searchResult := new(servicesUtils.ResultItem); reader.NextRecord(searchResult) == nil; searchResult = new(servicesUtils.ResultItem) {
 		m := referencePattern.FindStringSubmatch(searchResult.Path)
 		var reference types.Reference
 		user := m[1]
@@ -66,5 +73,6 @@ func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, r
 			retReferences = append(retReferences, element...)
 		}
 	}
+	log.Info("Found", strconv.Itoa(len(retReferences)), "references.")
 	return retReferences, nil
 }

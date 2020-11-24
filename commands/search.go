@@ -108,7 +108,7 @@ func searchCmd(c *components.Context) error {
 			return err
 		}
 		if len(references) > 0 {
-			log.Output(fmt.Sprintf("Found %d references:", len(references)))
+			//log.Output(fmt.Sprintf("Found %d references:", len(references)))
 			for _, ref := range references {
 				log.Output(ref.String())
 			}
