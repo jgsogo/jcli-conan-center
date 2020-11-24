@@ -7,7 +7,6 @@ import (
 
 	"github.com/jgsogo/jcli-conan-center/types"
 
-	"github.com/jfrog/jfrog-cli-core/artifactory/commands/generic"
 	"github.com/jfrog/jfrog-cli-core/artifactory/spec"
 	"github.com/jfrog/jfrog-cli-core/artifactory/utils"
 	"github.com/jfrog/jfrog-cli-core/utils/config"
@@ -29,12 +28,10 @@ func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, r
 	}
 	specSearchPattern = specSearchPattern + "/*/*/conanfile.py"
 	log.Debug(fmt.Sprintf("Search references using specPattern '%s'", specSearchPattern))
-	specFile := spec.NewBuilder().Pattern(specSearchPattern).IncludeDirs(false).BuildSpec()
+	specFile := *spec.NewBuilder().Pattern(specSearchPattern).IncludeDirs(false).BuildSpec()
 	referencePattern := regexp.MustCompile(repository + `\/(?P<user>` + types.ValidConanChars + `*)\/(?P<name>` + types.ValidConanChars + `+)\/(?P<version>` + types.ValidConanChars + `+)\/(?P<channel>` + types.ValidConanChars + `*)\/(?P<revision>[a-z0-9]+)\/export\/conanfile\.py`)
 
-	searchCmd := generic.NewSearchCommand()
-	searchCmd.SetRtDetails(rtDetails).SetSpec(specFile)
-	reader, err := searchCmd.Search()
+	reader, err := RunSearch(serviceManager, specFile)
 	if err != nil {
 		return nil, err
 	}
