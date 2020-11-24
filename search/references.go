@@ -8,18 +8,13 @@ import (
 
 	"github.com/jgsogo/jcli-conan-center/types"
 
-	"github.com/jfrog/jfrog-cli-core/artifactory/utils"
-	"github.com/jfrog/jfrog-cli-core/utils/config"
+	"github.com/jfrog/jfrog-client-go/artifactory"
 	"github.com/jfrog/jfrog-client-go/artifactory/services"
 	servicesUtils "github.com/jfrog/jfrog-client-go/artifactory/services/utils"
 	"github.com/jfrog/jfrog-client-go/utils/log"
 )
 
-func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, referenceName string, onlyLatest bool) ([]types.Reference, error) {
-	serviceManager, err := utils.CreateServiceManager(rtDetails, false)
-	if err != nil {
-		return nil, err
-	}
+func SearchReferences(serviceManager artifactory.ArtifactoryServicesManager, repository string, referenceName string, onlyLatest bool) ([]types.Reference, error) {
 	log.Info("Searching references...")
 
 	// Search all references (search for the 'conanfile.py')

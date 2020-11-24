@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jfrog/jfrog-cli-core/artifactory/spec"
 	"github.com/jfrog/jfrog-client-go/artifactory"
 	"github.com/jfrog/jfrog-client-go/artifactory/services"
 	"github.com/jfrog/jfrog-client-go/utils/io/content"
@@ -52,10 +51,13 @@ func TestParseRevisions(t *testing.T) {
 
 func TestRunSearch(t *testing.T) {
 	servicesManager := MockArtifactoryServicesManager{}
+	params := services.NewSearchParams()
+	params.Pattern = "the/pattern/to/search/for"
+	params.Recursive = false
+	params.IncludeDirs = false
 
-	specFile := *spec.NewBuilder().Pattern("a/pattern").IncludeDirs(false).BuildSpec()
-	revisions, err := RunSearch(&servicesManager, specFile)
+	reader, err := RunSearch(&servicesManager, params)
 	assert.Nil(t, err)
-	assert.Nil(t, revisions)
+	assert.Equal(t, reader.GetFilePath(), "filePath")
 
 }

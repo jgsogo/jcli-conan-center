@@ -74,9 +74,15 @@ func statsCmd(c *components.Context) error {
 		return err
 	}
 
+	// Create services manager
+	serviceManager, err := utils.CreateServiceManager(rtDetails, false)
+	if err != nil {
+		return err
+	}
+
 	// Search packages (first recipes and then packages)
 	packages := []types.Package{}
-	references, err := search.SearchReferences(rtDetails, repository, "", false)
+	references, err := search.SearchReferences(serviceManager, repository, "", false)
 	if err != nil {
 		return err
 	}
