@@ -1,6 +1,7 @@
 package search
 
 import (
+	"fmt"
 	"regexp"
 	"sort"
 
@@ -10,12 +11,20 @@ import (
 	"github.com/jfrog/jfrog-cli-core/artifactory/spec"
 	"github.com/jfrog/jfrog-cli-core/artifactory/utils"
 	"github.com/jfrog/jfrog-cli-core/utils/config"
+	"github.com/jfrog/jfrog-client-go/utils/log"
 )
 
-func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, onlyLatest bool) ([]types.Reference, error) {
+func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, referenceName string, onlyLatest bool) ([]types.Reference, error) {
 	// Search all references (search for the 'conanfile.py')
-
-	specFile := spec.NewBuilder().Pattern(repository + "/**/conanfile.py").IncludeDirs(false).BuildSpec()
+	specSearchPattern := repository + "/*/"
+	if len(referenceName) > 0 {
+		specSearchPattern = specSearchPattern + referenceName
+	} else {
+		specSearchPattern = specSearchPattern + "*"
+	}
+	specSearchPattern = specSearchPattern + "/*/*/conanfile.py"
+	log.Debug(fmt.Sprintf("Search references using specPattern '%s'", specSearchPattern))
+	specFile := spec.NewBuilder().Pattern(specSearchPattern).IncludeDirs(false).BuildSpec()
 	referencePattern := regexp.MustCompile(repository + `\/(?P<user>` + types.ValidConanChars + `*)\/(?P<name>` + types.ValidConanChars + `+)\/(?P<version>` + types.ValidConanChars + `+)\/(?P<channel>` + types.ValidConanChars + `*)\/(?P<revision>[a-z0-9]+)\/export\/conanfile\.py`)
 
 	searchCmd := generic.NewSearchCommand()
