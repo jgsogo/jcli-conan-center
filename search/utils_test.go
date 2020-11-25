@@ -1,7 +1,6 @@
 package search
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"strings"
@@ -36,7 +35,6 @@ func (esm *MockArtifactoryServicesManager) ReadRemoteFile(readPath string) (io.R
 }
 
 func (esm *MockArtifactoryServicesManager) SearchFiles(params services.SearchParams) (*content.ContentReader, error) {
-	fmt.Println(params.GetPattern())
 	return content.NewContentReader("filePath", "arrayKey"), nil
 }
 

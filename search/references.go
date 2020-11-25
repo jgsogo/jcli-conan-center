@@ -40,8 +40,8 @@ func SearchReferences(serviceManager artifactory.ArtifactoryServicesManager, rep
 	defer reader.Close()
 
 	references := make(map[string][]types.Reference)
-	for searchResult := new(servicesUtils.ResultItem); reader.NextRecord(searchResult) == nil; searchResult = new(servicesUtils.ResultItem) {
-		m := referencePattern.FindStringSubmatch(searchResult.Path)
+	for resultItem := new(servicesUtils.ResultItem); reader.NextRecord(resultItem) == nil; resultItem = new(servicesUtils.ResultItem) {
+		m := referencePattern.FindStringSubmatch(resultItem.Path)
 		var reference types.Reference
 		user := m[1]
 		channel := m[4]
