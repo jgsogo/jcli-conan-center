@@ -25,7 +25,7 @@ func (esm *MockRtServicesManager) SearchFiles(params services.SearchParams) (*co
 
 	tmpFile, _ := ioutil.TempFile(os.TempDir(), "prefix-")
 	fileContent, _ := ioutil.ReadFile(filePath)
-	tmpFile.Write(fileContent)
+	_, _ = tmpFile.Write(fileContent)
 	tmpFile.Close()
 
 	reader := content.NewContentReader(tmpFile.Name(), "results")
