@@ -15,6 +15,11 @@ import (
 )
 
 func SearchPackages(rtDetails *config.ArtifactoryDetails, repository string, referenceName string, onlyLatestRecipe bool, onlyLatestPackage bool) ([]types.Package, error) {
+	serviceManager, err := utils.CreateServiceManager(rtDetails, false)
+	if err != nil {
+		return nil, err
+	}
+
 	// Search all packages (search for the 'conaninfo.txt')
 	specSearchPattern := repository + "/*/"
 	if len(referenceName) > 0 {
@@ -69,7 +74,7 @@ func SearchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 	filteredPackages := make(map[string]map[string][]types.Package)
 	for key, element := range allPackages {
 		if onlyLatestRecipe && len(element) > 1 {
-			rtRevisions, err := ParseRevisions(rtDetails, repository+"/"+key+"/index.json")
+			rtRevisions, err := ParseRevisions(serviceManager, repository+"/"+key+"/index.json")
 			if err != nil {
 				return nil, err
 			}
@@ -101,7 +106,7 @@ func SearchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 	for key, element := range filteredPackages {
 		if onlyLatestPackage && len(element) > 1 {
 			for keyId, elementId := range element {
-				rtRevisions, err := ParseRevisions(rtDetails, repository+"/"+key+"/package/"+keyId+"/index.json")
+				rtRevisions, err := ParseRevisions(serviceManager, repository+"/"+key+"/package/"+keyId+"/index.json")
 				if err != nil {
 					return nil, err
 				}

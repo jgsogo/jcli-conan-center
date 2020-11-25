@@ -4,17 +4,19 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strconv"
 
 	"github.com/jgsogo/jcli-conan-center/types"
 
-	"github.com/jfrog/jfrog-cli-core/artifactory/commands/generic"
-	"github.com/jfrog/jfrog-cli-core/artifactory/spec"
-	"github.com/jfrog/jfrog-cli-core/artifactory/utils"
-	"github.com/jfrog/jfrog-cli-core/utils/config"
+	"github.com/jfrog/jfrog-client-go/artifactory"
+	"github.com/jfrog/jfrog-client-go/artifactory/services"
+	servicesUtils "github.com/jfrog/jfrog-client-go/artifactory/services/utils"
 	"github.com/jfrog/jfrog-client-go/utils/log"
 )
 
-func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, referenceName string, onlyLatest bool) ([]types.Reference, error) {
+func SearchReferences(serviceManager artifactory.ArtifactoryServicesManager, repository string, referenceName string, onlyLatest bool) ([]types.Reference, error) {
+	log.Info("Searching references...")
+
 	// Search all references (search for the 'conanfile.py')
 	specSearchPattern := repository + "/*/"
 	if len(referenceName) > 0 {
@@ -24,20 +26,22 @@ func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, r
 	}
 	specSearchPattern = specSearchPattern + "/*/*/conanfile.py"
 	log.Debug(fmt.Sprintf("Search references using specPattern '%s'", specSearchPattern))
-	specFile := spec.NewBuilder().Pattern(specSearchPattern).IncludeDirs(false).BuildSpec()
-	referencePattern := regexp.MustCompile(repository + `\/(?P<user>` + types.ValidConanChars + `*)\/(?P<name>` + types.ValidConanChars + `+)\/(?P<version>` + types.ValidConanChars + `+)\/(?P<channel>` + types.ValidConanChars + `*)\/(?P<revision>[a-z0-9]+)\/export\/conanfile\.py`)
+	referencePattern := regexp.MustCompile(`(?P<user>` + types.ValidConanChars + `*)\/(?P<name>` + types.ValidConanChars + `+)\/(?P<version>` + types.ValidConanChars + `+)\/(?P<channel>` + types.ValidConanChars + `*)\/(?P<revision>[a-z0-9]+)\/export`)
 
-	searchCmd := generic.NewSearchCommand()
-	searchCmd.SetRtDetails(rtDetails).SetSpec(specFile)
-	reader, err := searchCmd.Search()
+	params := services.NewSearchParams()
+	params.Pattern = specSearchPattern
+	params.Recursive = false
+	params.IncludeDirs = false
+
+	reader, err := RunSearch(serviceManager, params)
 	if err != nil {
 		return nil, err
 	}
 	defer reader.Close()
 
 	references := make(map[string][]types.Reference)
-	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
-		m := referencePattern.FindStringSubmatch(searchResult.Path)
+	for resultItem := new(servicesUtils.ResultItem); reader.NextRecord(resultItem) == nil; resultItem = new(servicesUtils.ResultItem) {
+		m := referencePattern.FindStringSubmatch(resultItem.Path)
 		var reference types.Reference
 		user := m[1]
 		channel := m[4]
@@ -53,7 +57,7 @@ func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, r
 	retReferences := []types.Reference{}
 	for _, element := range references {
 		if onlyLatest && len(element) > 1 {
-			rtRevisions, err := ParseRevisions(rtDetails, repository+"/"+element[0].RtPath(false)+"/index.json")
+			rtRevisions, err := ParseRevisions(serviceManager, repository+"/"+element[0].RtPath(false)+"/index.json")
 			if err != nil {
 				return nil, err
 			}
@@ -64,5 +68,6 @@ func SearchReferences(rtDetails *config.ArtifactoryDetails, repository string, r
 			retReferences = append(retReferences, element...)
 		}
 	}
+	log.Info("Found", strconv.Itoa(len(retReferences)), "references.")
 	return retReferences, nil
 }

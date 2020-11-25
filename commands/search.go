@@ -83,6 +83,12 @@ func searchCmd(c *components.Context) error {
 		return err
 	}
 
+	// Create services manager
+	serviceManager, err := utils.CreateServiceManager(rtDetails, false)
+	if err != nil {
+		return err
+	}
+
 	// Search
 	if c.GetBoolFlagValue("packages") {
 		log.Info("Command search - retrieve packages")
@@ -103,12 +109,12 @@ func searchCmd(c *components.Context) error {
 		log.Info("Command search - retrieve recipes")
 		referenceName := c.GetStringFlagValue("ref-name")
 		log.Info(fmt.Sprintf(" - ref-name: %s", referenceName))
-		references, err := search.SearchReferences(rtDetails, repository, referenceName, c.GetBoolFlagValue("only-latest"))
+		references, err := search.SearchReferences(serviceManager, repository, referenceName, c.GetBoolFlagValue("only-latest"))
 		if err != nil {
 			return err
 		}
 		if len(references) > 0 {
-			log.Output(fmt.Sprintf("Found %d references:", len(references)))
+			//log.Output(fmt.Sprintf("Found %d references:", len(references)))
 			for _, ref := range references {
 				log.Output(ref.String())
 			}

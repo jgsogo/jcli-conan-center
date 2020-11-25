@@ -1,0 +1,305 @@
+{
+    "results": [
+        {
+            "repo": "conan-center",
+            "path": "_/b2/4.0.0/_/5918010f58ef4294511ff176ccc236b0/export",
+            "name": "conanfile.py",
+            "type": "file",
+            "size": 4214,
+            "created": "2020-08-17T15:20:47.975Z",
+            "modified": "2020-08-17T15:20:47.936Z",
+            "actual_md5": "3c7b9492281d5e5ce7a662d37d90d7fa",
+            "actual_sha1": "bac00941f5237b4d5eb845313ef3f7f51f8daa6c",
+            "properties": [
+                {
+                    "key": "conan.package.url",
+                    "value": "https://github.com/conan-io/conan-center-index"
+                },
+                {
+                    "key": "conan.package.version",
+                    "value": "4.0.0"
+                },
+                {
+                    "key": "conan.package.license",
+                    "value": "BSL-1.0"
+                },
+                {
+                    "key": "conan.package.name",
+                    "value": "b2"
+                },
+                {
+                    "key": "conan.package.channel",
+                    "value": "_"
+                },
+                {
+                    "key": "conan.package.user",
+                    "value": "_"
+                }
+            ]
+        },
+        {
+            "repo": "conan-center",
+            "path": "_/b2/4.0.1/_/64a94a3e9fe90b33033ec9e00eb036e6/export",
+            "name": "conanfile.py",
+            "type": "file",
+            "size": 4214,
+            "created": "2020-08-17T15:20:52.701Z",
+            "modified": "2020-08-17T15:20:52.669Z",
+            "actual_md5": "3c7b9492281d5e5ce7a662d37d90d7fa",
+            "actual_sha1": "bac00941f5237b4d5eb845313ef3f7f51f8daa6c",
+            "properties": [
+                {
+                    "key": "conan.package.channel",
+                    "value": "_"
+                },
+                {
+                    "key": "conan.package.name",
+                    "value": "b2"
+                },
+                {
+                    "key": "conan.package.version",
+                    "value": "4.0.1"
+                },
+                {
+                    "key": "conan.package.license",
+                    "value": "BSL-1.0"
+                },
+                {
+                    "key": "conan.package.user",
+                    "value": "_"
+                },
+                {
+                    "key": "conan.package.url",
+                    "value": "https://github.com/conan-io/conan-center-index"
+                }
+            ]
+        },
+        {
+            "repo": "conan-center",
+            "path": "_/b2/4.2.0/_/7987eb34c600c944d8a30ffe090fd013/export",
+            "name": "conanfile.py",
+            "type": "file",
+            "size": 4214,
+            "created": "2020-08-17T15:21:01.865Z",
+            "modified": "2020-08-17T15:21:01.813Z",
+            "actual_md5": "3c7b9492281d5e5ce7a662d37d90d7fa",
+            "actual_sha1": "bac00941f5237b4d5eb845313ef3f7f51f8daa6c",
+            "properties": [
+                {
+                    "key": "conan.package.channel",
+                    "value": "_"
+                },
+                {
+                    "key": "conan.package.user",
+                    "value": "_"
+                },
+                {
+                    "key": "conan.package.license",
+                    "value": "BSL-1.0"
+                },
+                {
+                    "key": "conan.package.name",
+                    "value": "b2"
+                },
+                {
+                    "key": "conan.package.url",
+                    "value": "https://github.com/conan-io/conan-center-index"
+                },
+                {
+                    "key": "conan.package.version",
+                    "value": "4.2.0"
+                }
+            ]
+        },
+        {
+            "repo": "conan-center",
+            "path": "_/b2/4.1.0/_/151655c3ac57c4adcc3681a2bf44e0af/export",
+            "name": "conanfile.py",
+            "type": "file",
+            "size": 4214,
+            "created": "2020-08-17T15:21:04.454Z",
+            "modified": "2020-08-17T15:21:04.283Z",
+            "actual_md5": "3c7b9492281d5e5ce7a662d37d90d7fa",
+            "actual_sha1": "bac00941f5237b4d5eb845313ef3f7f51f8daa6c",
+            "properties": [
+                {
+                    "key": "conan.package.name",
+                    "value": "b2"
+                },
+                {
+                    "key": "conan.package.url",
+                    "value": "https://github.com/conan-io/conan-center-index"
+                },
+                {
+                    "key": "conan.package.user",
+                    "value": "_"
+                },
+                {
+                    "key": "conan.package.version",
+                    "value": "4.1.0"
+                },
+                {
+                    "key": "conan.package.channel",
+                    "value": "_"
+                },
+                {
+                    "key": "conan.package.license",
+                    "value": "BSL-1.0"
+                }
+            ]
+        },
+        {
+            "repo": "conan-center",
+            "path": "_/b2/4.0.0/_/3c07b6a54477e856d429493d01c85636/export",
+            "name": "conanfile.py",
+            "type": "file",
+            "size": 4231,
+            "created": "2020-09-16T14:05:06.061Z",
+            "modified": "2020-09-16T14:05:06.023Z",
+            "actual_md5": "830bfc7a21a0b5d7aac5397455e0b4a1",
+            "actual_sha1": "f52f4d323297b51ba20089b0676db1272fbed365",
+            "properties": [
+                {
+                    "key": "conan.package.version",
+                    "value": "4.0.0"
+                },
+                {
+                    "key": "conan.package.name",
+                    "value": "b2"
+                },
+                {
+                    "key": "conan.package.license",
+                    "value": "BSL-1.0"
+                },
+                {
+                    "key": "conan.package.user",
+                    "value": "_"
+                },
+                {
+                    "key": "conan.package.channel",
+                    "value": "_"
+                },
+                {
+                    "key": "conan.package.url",
+                    "value": "https://github.com/conan-io/conan-center-index"
+                }
+            ]
+        },
+        {
+            "repo": "conan-center",
+            "path": "_/b2/4.0.1/_/fe103dcc7b9fa2226d82f5fb43af1d09/export",
+            "name": "conanfile.py",
+            "type": "file",
+            "size": 4231,
+            "created": "2020-09-16T14:06:23.972Z",
+            "modified": "2020-09-16T14:06:23.934Z",
+            "actual_md5": "830bfc7a21a0b5d7aac5397455e0b4a1",
+            "actual_sha1": "f52f4d323297b51ba20089b0676db1272fbed365",
+            "properties": [
+                {
+                    "key": "conan.package.name",
+                    "value": "b2"
+                },
+                {
+                    "key": "conan.package.url",
+                    "value": "https://github.com/conan-io/conan-center-index"
+                },
+                {
+                    "key": "conan.package.user",
+                    "value": "_"
+                },
+                {
+                    "key": "conan.package.license",
+                    "value": "BSL-1.0"
+                },
+                {
+                    "key": "conan.package.channel",
+                    "value": "_"
+                },
+                {
+                    "key": "conan.package.version",
+                    "value": "4.0.1"
+                }
+            ]
+        },
+        {
+            "repo": "conan-center",
+            "path": "_/b2/4.2.0/_/efacbfac6ee3561ff07968a372b940af/export",
+            "name": "conanfile.py",
+            "type": "file",
+            "size": 4231,
+            "created": "2020-09-16T14:08:54.819Z",
+            "modified": "2020-09-16T14:08:54.791Z",
+            "actual_md5": "830bfc7a21a0b5d7aac5397455e0b4a1",
+            "actual_sha1": "f52f4d323297b51ba20089b0676db1272fbed365",
+            "properties": [
+                {
+                    "key": "conan.package.url",
+                    "value": "https://github.com/conan-io/conan-center-index"
+                },
+                {
+                    "key": "conan.package.name",
+                    "value": "b2"
+                },
+                {
+                    "key": "conan.package.channel",
+                    "value": "_"
+                },
+                {
+                    "key": "conan.package.version",
+                    "value": "4.2.0"
+                },
+                {
+                    "key": "conan.package.license",
+                    "value": "BSL-1.0"
+                },
+                {
+                    "key": "conan.package.user",
+                    "value": "_"
+                }
+            ]
+        },
+        {
+            "repo": "conan-center",
+            "path": "_/b2/4.3.0/_/ec8af29b790f5745890470ce4220ed50/export",
+            "name": "conanfile.py",
+            "type": "file",
+            "size": 4068,
+            "created": "2020-11-08T01:08:39.989Z",
+            "modified": "2020-11-08T01:08:39.955Z",
+            "actual_md5": "647ffca03d76875a7ac453095eed6bed",
+            "actual_sha1": "c8bc9868b7d063d8f8545f8d6394b6add6a828f1",
+            "properties": [
+                {
+                    "key": "conan.package.version",
+                    "value": "4.3.0"
+                },
+                {
+                    "key": "conan.package.license",
+                    "value": "BSL-1.0"
+                },
+                {
+                    "key": "conan.package.channel",
+                    "value": "_"
+                },
+                {
+                    "key": "conan.package.user",
+                    "value": "_"
+                },
+                {
+                    "key": "conan.package.url",
+                    "value": "https://github.com/conan-io/conan-center-index"
+                },
+                {
+                    "key": "conan.package.name",
+                    "value": "b2"
+                }
+            ]
+        }
+    ],
+    "range": {
+        "start_pos": 0,
+        "end_pos": 9,
+        "total": 9
+    }
+}
