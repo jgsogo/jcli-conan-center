@@ -1,9 +1,7 @@
 package search
 
 import (
-	"fmt"
 	"regexp"
-	"sort"
 
 	"github.com/jgsogo/jcli-conan-center/types"
 
@@ -14,6 +12,8 @@ import (
 )
 
 func SearchPackages(serviceManager artifactory.ArtifactoryServicesManager, repository string, referenceName string, onlyLatestRecipe bool, onlyLatestPackage bool) ([]types.Package, error) {
+	log.Info("Searching packages...")
+
 	// Search all packages (search for the 'conaninfo.txt')
 	specSearchPattern := repository + "/*/"
 	if len(referenceName) > 0 {
@@ -22,7 +22,6 @@ func SearchPackages(serviceManager artifactory.ArtifactoryServicesManager, repos
 		specSearchPattern = specSearchPattern + "*"
 	}
 	specSearchPattern = specSearchPattern + "/*/*/package/*/*/conaninfo.txt"
-	log.Debug(fmt.Sprintf("Search packages using specPattern '%s'", specSearchPattern))
 	pkgPattern := regexp.MustCompile(`(?P<user>` + types.ValidConanChars + `*)\/(?P<name>` + types.ValidConanChars + `+)\/(?P<version>` + types.ValidConanChars + `+)\/(?P<channel>` + types.ValidConanChars + `*)\/(?P<revision>[a-z0-9]+)\/package\/(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)`)
 
 	params := services.NewSearchParams()
@@ -107,7 +106,9 @@ func SearchPackages(serviceManager artifactory.ArtifactoryServicesManager, repos
 					return nil, err
 				}
 				latestRevision := rtRevisions[len(rtRevisions)-1]
-				i := sort.Search(len(elementId), func(i int) bool { return latestRevision.Revision == elementId[i].Revision })
+				i := Search(len(elementId), func(i int) bool {
+					return latestRevision.Revision == elementId[i].Revision
+				})
 				packages = append(packages, elementId[i])
 			}
 		} else {

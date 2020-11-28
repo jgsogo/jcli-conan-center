@@ -3,7 +3,6 @@ package search
 import (
 	"fmt"
 	"regexp"
-	"sort"
 	"strconv"
 
 	"github.com/jgsogo/jcli-conan-center/types"
@@ -62,7 +61,7 @@ func SearchReferences(serviceManager artifactory.ArtifactoryServicesManager, rep
 				return nil, err
 			}
 			latestRevision := rtRevisions[len(rtRevisions)-1]
-			i := sort.Search(len(element), func(i int) bool { return latestRevision.Revision == element[i].Revision })
+			i := Search(len(element), func(i int) bool { return latestRevision.Revision == element[i].Revision })
 			retReferences = append(retReferences, element[i])
 		} else {
 			retReferences = append(retReferences, element...)

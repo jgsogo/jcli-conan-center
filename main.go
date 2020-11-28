@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/jgsogo/jcli-conan-center/commands"
 	"github.com/jfrog/jfrog-cli-core/plugins"
 	"github.com/jfrog/jfrog-cli-core/plugins/components"
+	"github.com/jgsogo/jcli-conan-center/commands"
 	//"github.com/jfrog/jfrog-cli-plugin-template/commands"
 )
 

@@ -21,6 +21,9 @@ const (
 		}, {
 			"revision": "5918010f58ef4294511ff176ccc236b0",
 			"time": "2020-08-17T15:20:47.871+0000"
+		}, {
+			"revision": "7777777777",
+			"time": "2020-08-15T15:20:47.871+0000"
 		}]
 	}`
 )
@@ -42,9 +45,10 @@ func TestParseRevisions(t *testing.T) {
 	servicesManager := MockArtifactoryServicesManager{}
 	revisions, err := ParseRevisions(&servicesManager, "indexPath")
 	assert.Nil(t, err)
-	assert.Equal(t, len(revisions), 2)
-	assert.Equal(t, revisions[0].Revision, "5918010f58ef4294511ff176ccc236b0")
-	assert.Equal(t, revisions[1].Revision, "3c07b6a54477e856d429493d01c85636")
+	assert.Equal(t, len(revisions), 3)
+	assert.Equal(t, revisions[0].Revision, "7777777777")
+	assert.Equal(t, revisions[1].Revision, "5918010f58ef4294511ff176ccc236b0")
+	assert.Equal(t, revisions[2].Revision, "3c07b6a54477e856d429493d01c85636")
 }
 
 func TestRunSearch(t *testing.T) {
