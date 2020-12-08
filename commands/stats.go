@@ -88,7 +88,7 @@ func statsCmd(c *components.Context) error {
 	}
 	log.Output("Found", len(references), "Conan references")
 	for _, ref := range references {
-		refPackages, err := search.SearchPackages(rtDetails, repository, ref.Name, false, false)
+		refPackages, err := search.SearchPackages(serviceManager, repository, ref.Name, false, false)
 		if err != nil {
 			return err
 		}
@@ -98,7 +98,7 @@ func statsCmd(c *components.Context) error {
 	log.Output("Total found", len(packages), "packages")
 
 	// Search packages (all at once)
-	allPackages, err := search.SearchPackages(rtDetails, repository, "", false, false)
+	allPackages, err := search.SearchPackages(serviceManager, repository, "", false, false)
 	if err != nil {
 		return err
 	}

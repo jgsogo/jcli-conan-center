@@ -9,11 +9,16 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/jfrog/jfrog-cli-core/utils/log"
 	"github.com/jfrog/jfrog-client-go/artifactory"
 	"github.com/jfrog/jfrog-client-go/artifactory/services"
 	"github.com/jfrog/jfrog-client-go/utils/io/content"
 	"github.com/stretchr/testify/assert"
 )
+
+func init() {
+	log.SetDefaultLogger()
+}
 
 type MockRtServicesManager struct {
 	artifactory.EmptyArtifactoryServicesManager
@@ -37,11 +42,11 @@ func (esm *MockRtServicesManager) ReadRemoteFile(readPath string) (io.ReadCloser
 		return ioutil.NopCloser(strings.NewReader(`{
 			"reference": "b2/4.0.0@_/_",
 			"revisions": [{
-				"revision": "3c07b6a54477e856d429493d01c85636",
-				"time": "2020-09-16T14:05:05.965+0000"
-			}, {
 				"revision": "5918010f58ef4294511ff176ccc236b0",
 				"time": "2020-08-17T15:20:47.871+0000"
+			}, {
+				"revision": "3c07b6a54477e856d429493d01c85636",
+				"time": "2020-09-16T14:05:05.965+0000"
 			}]
 		}`)), nil
 	} else if readPath == "repository/_/b2/4.0.1/_/index.json" {
@@ -72,11 +77,6 @@ func (esm *MockRtServicesManager) ReadRemoteFile(readPath string) (io.ReadCloser
 
 func TestSearchReferences(t *testing.T) {
 	servicesManager := MockRtServicesManager{}
-	params := services.NewSearchParams()
-	params.Pattern = "the/pattern/to/search/for"
-	params.Recursive = false
-	params.IncludeDirs = false
-
 	references, err := SearchReferences(&servicesManager, "repository", "name/version", false)
 	assert.Nil(t, err)
 	assert.Equal(t, 8, len(references))
@@ -84,11 +84,6 @@ func TestSearchReferences(t *testing.T) {
 
 func TestSearchReferencesLatest(t *testing.T) {
 	servicesManager := MockRtServicesManager{}
-	params := services.NewSearchParams()
-	params.Pattern = "the/pattern/to/search/for"
-	params.Recursive = false
-	params.IncludeDirs = false
-
 	references, err := SearchReferences(&servicesManager, "repository", "name/version", true)
 	assert.Nil(t, err)
 	sort.Slice(references, func(i, j int) bool {

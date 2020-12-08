@@ -12,6 +12,15 @@ import (
 	"github.com/jgsogo/jcli-conan-center/types"
 )
 
+func Search(length int, f func(index int) bool) int {
+    for index := 0; index < length; index++ {
+        if f(index) {
+            return index
+        }
+    }
+    return -1
+}
+
 func ParseRevisions(serviceManager artifactory.ArtifactoryServicesManager, indexPath string) ([]types.RtRevisionsData, error) {
 	ioReaderCloser, err := serviceManager.ReadRemoteFile(indexPath)
 	if err != nil {

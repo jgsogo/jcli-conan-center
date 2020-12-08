@@ -1,24 +1,18 @@
 package search
 
 import (
-	"fmt"
 	"regexp"
-	"sort"
 
 	"github.com/jgsogo/jcli-conan-center/types"
 
-	"github.com/jfrog/jfrog-cli-core/artifactory/commands/generic"
-	"github.com/jfrog/jfrog-cli-core/artifactory/spec"
-	"github.com/jfrog/jfrog-cli-core/artifactory/utils"
-	"github.com/jfrog/jfrog-cli-core/utils/config"
+	"github.com/jfrog/jfrog-client-go/artifactory"
+	"github.com/jfrog/jfrog-client-go/artifactory/services"
+	servicesUtils "github.com/jfrog/jfrog-client-go/artifactory/services/utils"
 	"github.com/jfrog/jfrog-client-go/utils/log"
 )
 
-func SearchPackages(rtDetails *config.ArtifactoryDetails, repository string, referenceName string, onlyLatestRecipe bool, onlyLatestPackage bool) ([]types.Package, error) {
-	serviceManager, err := utils.CreateServiceManager(rtDetails, false)
-	if err != nil {
-		return nil, err
-	}
+func SearchPackages(serviceManager artifactory.ArtifactoryServicesManager, repository string, referenceName string, onlyLatestRecipe bool, onlyLatestPackage bool) ([]types.Package, error) {
+	log.Info("Searching packages...")
 
 	// Search all packages (search for the 'conaninfo.txt')
 	specSearchPattern := repository + "/*/"
@@ -28,13 +22,14 @@ func SearchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 		specSearchPattern = specSearchPattern + "*"
 	}
 	specSearchPattern = specSearchPattern + "/*/*/package/*/*/conaninfo.txt"
-	log.Debug(fmt.Sprintf("Search packages using specPattern '%s'", specSearchPattern))
-	specFile := spec.NewBuilder().Pattern(specSearchPattern).IncludeDirs(false).BuildSpec()
-	pkgPattern := regexp.MustCompile(repository + `\/(?P<user>` + types.ValidConanChars + `*)\/(?P<name>` + types.ValidConanChars + `+)\/(?P<version>` + types.ValidConanChars + `+)\/(?P<channel>` + types.ValidConanChars + `*)\/(?P<revision>[a-z0-9]+)\/package\/(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)\/conaninfo.txt`)
+	pkgPattern := regexp.MustCompile(`(?P<user>` + types.ValidConanChars + `*)\/(?P<name>` + types.ValidConanChars + `+)\/(?P<version>` + types.ValidConanChars + `+)\/(?P<channel>` + types.ValidConanChars + `*)\/(?P<revision>[a-z0-9]+)\/package\/(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)`)
 
-	searchCmd := generic.NewSearchCommand()
-	searchCmd.SetRtDetails(rtDetails).SetSpec(specFile)
-	reader, err := searchCmd.Search()
+	params := services.NewSearchParams()
+	params.Pattern = specSearchPattern
+	params.Recursive = false
+	params.IncludeDirs = false
+
+	reader, err := RunSearch(serviceManager, params)
 	if err != nil {
 		return nil, err
 	}
@@ -42,8 +37,8 @@ func SearchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 
 	//
 	allPackages := make(map[string]map[string]map[string][]types.Package)
-	for searchResult := new(utils.SearchResult); reader.NextRecord(searchResult) == nil; searchResult = new(utils.SearchResult) {
-		m := pkgPattern.FindStringSubmatch(searchResult.Path)
+	for resultItem := new(servicesUtils.ResultItem); reader.NextRecord(resultItem) == nil; resultItem = new(servicesUtils.ResultItem) {
+		m := pkgPattern.FindStringSubmatch(resultItem.Path)
 		var reference types.Reference
 		user := m[1]
 		channel := m[4]
@@ -111,7 +106,9 @@ func SearchPackages(rtDetails *config.ArtifactoryDetails, repository string, ref
 					return nil, err
 				}
 				latestRevision := rtRevisions[len(rtRevisions)-1]
-				i := sort.Search(len(elementId), func(i int) bool { return latestRevision.Revision == elementId[i].Revision })
+				i := Search(len(elementId), func(i int) bool {
+					return latestRevision.Revision == elementId[i].Revision
+				})
 				packages = append(packages, elementId[i])
 			}
 		} else {

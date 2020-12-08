@@ -95,7 +95,7 @@ func searchCmd(c *components.Context) error {
 		referenceName := c.GetStringFlagValue("ref-name")
 		log.Info(fmt.Sprintf(" - ref-name: %s", referenceName))
 		onlyLatest := c.GetBoolFlagValue("only-latest")
-		packages, err := search.SearchPackages(rtDetails, repository, referenceName, onlyLatest, onlyLatest)
+		packages, err := search.SearchPackages(serviceManager, repository, referenceName, onlyLatest, onlyLatest)
 		if err != nil {
 			return err
 		}
