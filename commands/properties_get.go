@@ -142,6 +142,9 @@ func propertiesGetCmd(c *components.Context) error {
 
 	// Get properties for the given reference
 	properties, err := readProperties(serviceManager, repository, rtReference.RtPath(true))
+	if err != nil {
+		return err
+	}
 	log.Output(fmt.Sprintf("Reference '%s':", rtReference.ToString(true)))
 	for i := range properties {
 		prop := properties[i]
