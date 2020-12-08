@@ -5,20 +5,37 @@ import (
 	"strings"
 
 	servicesUtils "github.com/jfrog/jfrog-client-go/artifactory/services/utils"
+	"github.com/jgsogo/jcli-conan-center/types"
 )
 
 // Package contains information about a single packageID inside the `IndexData`
 type Package struct {
-	PackageID       string `json:"package_id"`
-	Version         string `json:"version"`
-	PackageRevision string `json:"package_revision"`
-	Settings map[string]string `json:"settings"`
-	Requires []string          `json:"requires"`
+	PackageID       string            `json:"package_id"`
+	Version         string            `json:"version"`
+	PackageRevision string            `json:"package_revision"`
+	Settings        map[string]string `json:"settings"`
+	Requires        []string          `json:"requires"`
 }
 
-// NewPackage creates a `Package` instance and initializes its members
-func NewPackage() *Package {
-	return &Package{Settings: make(map[string]string)}
+// NewPackageUsingProperties creates a `Package` instance and initializes its members
+func NewPackageUsingProperties(pkg types.Package, props []servicesUtils.Property) *Package {
+	packageData := &Package{
+		PackageID:       pkg.PackageId,
+		Version:         pkg.Ref.Version,
+		PackageRevision: pkg.Revision,
+	}
+	packageData.Settings = make(map[string]string)
+	for i := range props {
+		prop := props[i]
+		switch key := prop.Key; key {
+		case "settings":
+			s := strings.SplitN(prop.Value, "=", 2)
+			packageData.AddSetting(s[0], s[1])
+		case "requires":
+			packageData.Requires = append(packageData.Requires, prop.Value)
+		}
+	}
+	return packageData
 }
 
 // AddSetting add the key-value pair for a settings, taking into account some key transformations.
@@ -64,21 +81,30 @@ func NewFromProperties(ref types.Reference, props []servicesUtils.Property) *Ind
 		Version:        ref.Version,
 	}
 	if ref.User != nil {
-		indexData.User = ref.User
+		indexData.User = *ref.User
 	}
 	if ref.Channel != nil {
-		indexData.Channel = ref.Channel
+		indexData.Channel = *ref.Channel
 	}
 
-	for i:= range props {
+	topics := []string{}
+	for i := range props {
 		prop := props[i]
 		switch key := prop.Key; key {
-		case "user":
-			indexData.User = prop.Value
-		case "channel":
-			indexData.Channel = prop.Value
-		case ""
+		case "description":
+			indexData.Description = prop.Value
+		case "license":
+			indexData.License = prop.Value
+		case "homepage":
+			indexData.Homepage = prop.Value
+		case "url":
+			indexData.URL = prop.Value
+		case "topics":
+			topics = append(topics, prop.Value)
+		case "requires":
+			indexData.Requires = append(indexData.Requires, prop.Value)
 		}
 	}
+	indexData.Topics = strings.Join(topics, ",")
 	return indexData
 }
