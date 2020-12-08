@@ -3,7 +3,7 @@ package indexer
 import (
 	"encoding/json"
 	"testing"
-
+	servicesUtils "github.com/jfrog/jfrog-client-go/artifactory/services/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -63,4 +63,19 @@ func TestIndexDataEmptyFields(t *testing.T) {
 	b, err := json.Marshal(data)
 	assert.Nil(t, err)
 	assert.Equal(t, `{"user":"user","channel":"channel","recipe_revision":"rrev","name":"name","version":"version","requires":["r1"],"packages":null,"force":true,"force_requires":true,"force_settings":true}`, string(b))
+}
+
+func TestNewFromProperties(t *testing.T) {
+	props := []servicesUtils.Property{}
+	props = append(props, servicesUtils.Property{Key: "topics", Value: "topic1"})
+	props = append(props, servicesUtils.Property{Key: "topics", Value: "topic2"})
+	props = append(props, servicesUtils.Property{Key: "settings", Value: "os"})
+	props = append(props, servicesUtils.Property{Key: "settings", Value: "arch"})
+	props = append(props, servicesUtils.Property{Key: "description", Value: "B2 makes it easy to build C++ projects, everywhere."})
+	props = append(props, servicesUtils.Property{Key: "user"})
+	props = append(props, servicesUtils.Property{Key: "deprecated"})
+	props = append(props, servicesUtils.Property{Key: "options", Value: "toolset"})
+
+	indexData := NewFromProperties(props)
+	assert.Equal(t, "aaa", indexData.Name)
 }

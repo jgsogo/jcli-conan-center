@@ -1,7 +1,11 @@
 // Package indexer contains the types and functions related to the ConanCenter indexer
 package indexer
 
-import "strings"
+import (
+	"strings"
+
+	servicesUtils "github.com/jfrog/jfrog-client-go/artifactory/services/utils"
+)
 
 // Package contains information about a single packageID inside the `IndexData`
 type Package struct {
@@ -50,4 +54,31 @@ func (data *IndexData) SetForce(value bool) {
 	data.Force = value
 	data.ForceRequires = value
 	data.ForceSettings = value
+}
+
+// NewFromProperties creates a `IndexData` and populates it with Artifactory properties
+func NewFromProperties(ref types.Reference, props []servicesUtils.Property) *IndexData {
+	indexData := &IndexData{
+		RecipeRevision: ref.Revision,
+		Name:           ref.Name,
+		Version:        ref.Version,
+	}
+	if ref.User != nil {
+		indexData.User = ref.User
+	}
+	if ref.Channel != nil {
+		indexData.Channel = ref.Channel
+	}
+
+	for i:= range props {
+		prop := props[i]
+		switch key := prop.Key; key {
+		case "user":
+			indexData.User = prop.Value
+		case "channel":
+			indexData.Channel = prop.Value
+		case ""
+		}
+	}
+	return indexData
 }

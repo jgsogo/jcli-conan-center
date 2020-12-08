@@ -12,6 +12,7 @@ import (
 	"github.com/jfrog/jfrog-client-go/artifactory/services"
 	servicesUtils "github.com/jfrog/jfrog-client-go/artifactory/services/utils"
 	"github.com/jfrog/jfrog-client-go/utils/log"
+	"github.com/jgsogo/jcli-conan-center/indexer"
 	"github.com/jgsogo/jcli-conan-center/search"
 	"github.com/jgsogo/jcli-conan-center/types"
 )
@@ -105,6 +106,7 @@ func indexReferenceCmd(c *components.Context) error {
 	}
 	log.Info(" - working reference:", rtReference.ToString(true))
 
+	//indexData := indexer.IndexData{}
 	// Get properties for the given reference
 	properties, err := search.ReadReferenceProperties(serviceManager, repository, *rtReference)
 	if err != nil {
