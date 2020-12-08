@@ -29,5 +29,6 @@ func getCommands() []components.Command {
 		commands.GetStatsCommand(),
 		commands.GetSearchCommand(),
 		commands.GetPropertiesGetCommand(),
+		commands.GetIndexReferenceCommand(),
 	}
 }
