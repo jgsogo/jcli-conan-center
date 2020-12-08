@@ -115,6 +115,12 @@
 				<dd><a href="#ParseRevisions">func ParseRevisions(serviceManager artifactory.ArtifactoryServicesManager, indexPath string) ([]types.RtRevisionsData, error)</a></dd>
 			
 				
+				<dd><a href="#ReadPackageProperties">func ReadPackageProperties(serviceManager artifactory.ArtifactoryServicesManager, repository string, pkg types.Package) ([]servicesUtils.Property, error)</a></dd>
+			
+				
+				<dd><a href="#ReadReferenceProperties">func ReadReferenceProperties(serviceManager artifactory.ArtifactoryServicesManager, repository string, ref types.Reference) ([]servicesUtils.Property, error)</a></dd>
+			
+				
 				<dd><a href="#RunSearch">func RunSearch(servicesManager artifactory.ArtifactoryServicesManager, searchParams services.SearchParams) (*content.ContentReader, error)</a></dd>
 			
 				
@@ -157,7 +163,7 @@
 		
 			
 			
-			<h2 id="ParseRevisions">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=496:621#L14">ParseRevisions</a>
+			<h2 id="ParseRevisions">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=550:675#L16">ParseRevisions</a>
 				<a class="permalink" href="#ParseRevisions">&#xb6;</a>
 				
 				
@@ -170,7 +176,33 @@
 		
 			
 			
-			<h2 id="RunSearch">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=1039:1177#L33">RunSearch</a>
+			<h2 id="ReadPackageProperties">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=2401:2554#L72">ReadPackageProperties</a>
+				<a class="permalink" href="#ReadPackageProperties">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func ReadPackageProperties(serviceManager <a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/">artifactory</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/#ArtifactoryServicesManager">ArtifactoryServicesManager</a>, repository <a href="/pkg/builtin/#string">string</a>, pkg <a href="/pkg/github.com/jgsogo/jcli-conan-center/types/">types</a>.<a href="/pkg/github.com/jgsogo/jcli-conan-center/types/#Package">Package</a>) ([]<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/services/utils/">servicesUtils</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/services/utils/#Property">Property</a>, <a href="/pkg/builtin/#error">error</a>)</pre>
+			
+			
+			
+
+		
+			
+			
+			<h2 id="ReadReferenceProperties">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=2037:2194#L64">ReadReferenceProperties</a>
+				<a class="permalink" href="#ReadReferenceProperties">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func ReadReferenceProperties(serviceManager <a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/">artifactory</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/#ArtifactoryServicesManager">ArtifactoryServicesManager</a>, repository <a href="/pkg/builtin/#string">string</a>, ref <a href="/pkg/github.com/jgsogo/jcli-conan-center/types/">types</a>.<a href="/pkg/github.com/jgsogo/jcli-conan-center/types/#Reference">Reference</a>) ([]<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/services/utils/">servicesUtils</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/services/utils/#Property">Property</a>, <a href="/pkg/builtin/#error">error</a>)</pre>
+			
+			
+			
+
+		
+			
+			
+			<h2 id="RunSearch">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=1093:1231#L35">RunSearch</a>
 				<a class="permalink" href="#RunSearch">&#xb6;</a>
 				
 				
@@ -183,7 +215,7 @@
 		
 			
 			
-			<h2 id="Search">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=316:367#L5">Search</a>
+			<h2 id="Search">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=400:451#L7">Search</a>
 				<a class="permalink" href="#Search">&#xb6;</a>
 				
 				
