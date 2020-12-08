@@ -65,10 +65,9 @@ func parseReference(reference string) types.Reference {
 		if channel != "" || user != "" {
 			panic("Provided reference contains 'channel' or 'user', but not both!")
 		}
-		return types.Reference{name, version, nil, nil, revision}
-	} else {
-		return types.Reference{name, version, &user, &channel, revision}
-	}
+		return types.Reference{Name: name, Version: version, User: nil, Channel: nil, Revision: revision}
+	} 
+	return types.Reference{Name: name, Version: version, User: &user, Channel: &channel, Revision: revision}
 }
 
 func propertiesGetCmd(c *components.Context) error {
@@ -116,7 +115,6 @@ func propertiesGetCmd(c *components.Context) error {
 	log.Info(" - working reference:", rtReference.ToString(true))
 
 	// Get properties for the given reference
-	
 
 	return nil
 }
