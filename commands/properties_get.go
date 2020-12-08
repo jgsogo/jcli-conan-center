@@ -3,17 +3,17 @@ package commands
 import (
 	"errors"
 	"fmt"
-	"regexp"
-	"strconv"
-
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands"
 	"github.com/jfrog/jfrog-cli-core/artifactory/utils"
 	"github.com/jfrog/jfrog-cli-core/plugins/components"
+	"github.com/jfrog/jfrog-client-go/artifactory"
 	"github.com/jfrog/jfrog-client-go/artifactory/services"
 	servicesUtils "github.com/jfrog/jfrog-client-go/artifactory/services/utils"
 	"github.com/jfrog/jfrog-client-go/utils/log"
 	"github.com/jgsogo/jcli-conan-center/search"
 	"github.com/jgsogo/jcli-conan-center/types"
+	"regexp"
+	"strconv"
 )
 
 // GetPropertiesGetCommand returns object description for the command 'properties'
@@ -37,6 +37,11 @@ func getPropertiesGetFlags() []components.Flag {
 			Name:         "server-id",
 			Description:  "Artifactory server ID configured using the config command. If not specified, the default configured Artifactory server is used.",
 			DefaultValue: "",
+		},
+		components.BoolFlag{
+			Name:         "packages",
+			Description:  "If specified, it will retrieve also packages",
+			DefaultValue: false,
 		},
 	}
 }
@@ -70,6 +75,25 @@ func parseReference(reference string) types.Reference {
 		return types.Reference{Name: name, Version: version, User: nil, Channel: nil, Revision: revision}
 	}
 	return types.Reference{Name: name, Version: version, User: &user, Channel: &channel, Revision: revision}
+}
+
+func readProperties(serviceManager artifactory.ArtifactoryServicesManager, repository string, rtPath string) ([]servicesUtils.Property, error) {
+	// Get properties for the given reference
+	params := services.NewSearchParams()
+	params.Pattern = repository + "/" + rtPath
+	params.Recursive = false
+	params.IncludeDirs = true
+
+	reader, err := search.RunSearch(serviceManager, params)
+	if err != nil {
+		return nil, err
+	}
+	defer reader.Close()
+
+	for resultItem := new(servicesUtils.ResultItem); reader.NextRecord(resultItem) == nil; resultItem = new(servicesUtils.ResultItem) {
+		return resultItem.Properties, nil
+	}
+	panic(fmt.Sprintf("Properties for '%s' not found!", rtPath))
 }
 
 func propertiesGetCmd(c *components.Context) error {
@@ -117,23 +141,41 @@ func propertiesGetCmd(c *components.Context) error {
 	log.Info(" - working reference:", rtReference.ToString(true))
 
 	// Get properties for the given reference
-	params := services.NewSearchParams()
-	params.Pattern = repository + "/" + rtReference.RtPath(true) // Trailing slash
-	params.Recursive = false
-	params.IncludeDirs = true
-
-	reader, err := search.RunSearch(serviceManager, params)
-	if err != nil {
-		return err
+	properties, err := readProperties(serviceManager, repository, rtReference.RtPath(true))
+	log.Output(fmt.Sprintf("Reference '%s':", rtReference.ToString(true)))
+	for i := range properties {
+		prop := properties[i]
+		log.Output(fmt.Sprintf("  %s: %s", prop.Key, prop.Value))
 	}
-	defer reader.Close()
 
-	for resultItem := new(servicesUtils.ResultItem); reader.NextRecord(resultItem) == nil; resultItem = new(servicesUtils.ResultItem) {
-		log.Info(resultItem.Path)
-		log.Output(fmt.Sprintf("Properties for '%s':", rtReference.ToString(true)))
-		for i := range resultItem.Properties {
-			prop := resultItem.Properties[i]
-			log.Output(fmt.Sprintf("  %s: %s", prop.Key, prop.Value))
+	if c.GetBoolFlagValue("packages") {
+		// Get all packages for the given reference
+		specSearchPattern := repository + "/" + rtReference.RtPath(true) + "/package/*/*/conaninfo.txt"
+		params := services.NewSearchParams()
+		params.Pattern = specSearchPattern
+		params.Recursive = false
+		params.IncludeDirs = false
+
+		reader, err := search.RunSearch(serviceManager, params)
+		if err != nil {
+			return err
+		}
+		defer reader.Close()
+
+		//
+		pkgPattern := regexp.MustCompile(rtReference.RtPath(true) + "/package/" + `(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)`)
+		for resultItem := new(servicesUtils.ResultItem); reader.NextRecord(resultItem) == nil; resultItem = new(servicesUtils.ResultItem) {
+			m := pkgPattern.FindStringSubmatch(resultItem.Path)
+			pkgReference := types.Package{Ref: rtReference, PackageId: m[1], Revision: m[2]}
+			properties, err := readProperties(serviceManager, repository, pkgReference.RtPath(true))
+			if err != nil {
+				return err
+			}
+			log.Output(fmt.Sprintf("Package '%s':", pkgReference.ToString(true)))
+			for i := range properties {
+				prop := properties[i]
+				log.Output(fmt.Sprintf("  %s: %s", prop.Key, prop.Value))
+			}
 		}
 	}
 

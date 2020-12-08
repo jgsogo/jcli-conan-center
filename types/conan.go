@@ -72,10 +72,21 @@ type Package struct {
 }
 
 func (pkg *Package) String() string {
-	return fmt.Sprintf("%s:%s#%s", pkg.Ref.String(), pkg.PackageId, pkg.Revision)
+	return pkg.ToString(true)
 }
 
-//func (pkg *Package) RtPath() string {
-//	str := []string{pkg.Ref.rtPath(), "package", pkg.PackageId, pkg.Revision}
-//	return strings.Join(str, "/")
-//}
+func (pkg *Package) ToString(withRevision bool) string {
+	ret := pkg.Ref.ToString(withRevision) + ":" + pkg.PackageId
+	if withRevision {
+		ret = ret + "#" + pkg.Revision
+	}
+	return ret
+}
+
+func (pkg *Package) RtPath(withRevision bool) string {
+	str := []string{pkg.Ref.RtPath(true), "package", pkg.PackageId}
+	if withRevision {
+		str = append(str, pkg.Revision)
+	}
+	return strings.Join(str, "/")
+}
