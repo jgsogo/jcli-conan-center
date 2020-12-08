@@ -18,14 +18,6 @@ type Reference struct {
 	Revision string
 }
 
-//func MakeReference(name string, version string, revision string) Reference {
-//	return Reference{name, version, "_", "_", revision}
-//}
-
-//func MakeReference(name string, version string, user *string, channel *string, revision string) Reference {
-//	return Reference{name, version, user, channel, revision}
-//}
-
 func (ref *Reference) ToString(withRevision bool) string {
 	var ret string
 	if ref.User != nil {
