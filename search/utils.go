@@ -61,7 +61,9 @@ func readProperties(serviceManager artifactory.ArtifactoryServicesManager, repos
 	if err != nil {
 		return nil, err
 	}
-	defer reader.Close()
+	//defer reader.Close()
+	log.Info(reader.GetFilePath())
+	
 	for resultItem := new(servicesUtils.ResultItem); reader.NextRecord(resultItem) == nil; resultItem = new(servicesUtils.ResultItem) {
 		return resultItem.Properties, nil
 	}
