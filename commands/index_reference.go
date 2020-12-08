@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"regexp"
@@ -106,48 +107,56 @@ func indexReferenceCmd(c *components.Context) error {
 	}
 	log.Info(" - working reference:", rtReference.ToString(true))
 
-	//indexData := indexer.IndexData{}
 	// Get properties for the given reference
 	properties, err := search.ReadReferenceProperties(serviceManager, repository, *rtReference)
 	if err != nil {
 		return err
 	}
-	log.Output(fmt.Sprintf("Reference '%s':", rtReference.ToString(true)))
+	indexData := indexer.NewFromProperties(*rtReference, properties)
+	log.Debug(fmt.Sprintf("Reference '%s':", rtReference.ToString(true)))
 	for i := range properties {
 		prop := properties[i]
-		log.Output(fmt.Sprintf("  %s: %s", prop.Key, prop.Value))
+		log.Debug(fmt.Sprintf("  %s: %s", prop.Key, prop.Value))
 	}
 
-	if c.GetBoolFlagValue("packages") {
-		// Get all packages for the given reference
-		specSearchPattern := repository + "/" + rtReference.RtPath(true) + "/package/*/*/conaninfo.txt"
-		params := services.NewSearchParams()
-		params.Pattern = specSearchPattern
-		params.Recursive = false
-		params.IncludeDirs = false
+	// Get all packages for the given reference
+	specSearchPattern := repository + "/" + rtReference.RtPath(true) + "/package/*/*/conaninfo.txt"
+	params := services.NewSearchParams()
+	params.Pattern = specSearchPattern
+	params.Recursive = false
+	params.IncludeDirs = false
 
-		reader, err := search.RunSearch(serviceManager, params)
+	reader, err := search.RunSearch(serviceManager, params)
+	if err != nil {
+		return err
+	}
+	defer reader.Close()
+
+	//
+	pkgPattern := regexp.MustCompile(rtReference.RtPath(true) + "/package/" + `(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)`)
+	for resultItem := new(servicesUtils.ResultItem); reader.NextRecord(resultItem) == nil; resultItem = new(servicesUtils.ResultItem) {
+		m := pkgPattern.FindStringSubmatch(resultItem.Path)
+		pkgReference := types.Package{Ref: *rtReference, PackageId: m[1], Revision: m[2]}
+		properties, err := search.ReadPackageProperties(serviceManager, repository, pkgReference)
 		if err != nil {
 			return err
 		}
-		defer reader.Close()
-
-		//
-		pkgPattern := regexp.MustCompile(rtReference.RtPath(true) + "/package/" + `(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)`)
-		for resultItem := new(servicesUtils.ResultItem); reader.NextRecord(resultItem) == nil; resultItem = new(servicesUtils.ResultItem) {
-			m := pkgPattern.FindStringSubmatch(resultItem.Path)
-			pkgReference := types.Package{Ref: *rtReference, PackageId: m[1], Revision: m[2]}
-			properties, err := search.ReadPackageProperties(serviceManager, repository, pkgReference)
-			if err != nil {
-				return err
-			}
-			log.Output(fmt.Sprintf("Package '%s':", pkgReference.ToString(true)))
-			for i := range properties {
-				prop := properties[i]
-				log.Output(fmt.Sprintf("  %s: %s", prop.Key, prop.Value))
-			}
+		packageData := indexer.NewPackageUsingProperties(pkgReference, properties)
+		indexData.Packages = append(indexData.Packages, *packageData)
+		log.Debug(fmt.Sprintf("Package '%s':", pkgReference.ToString(true)))
+		for i := range properties {
+			prop := properties[i]
+			log.Debug(fmt.Sprintf("  %s: %s", prop.Key, prop.Value))
 		}
 	}
+	indexData.SetForce(c.GetBoolFlagValue("force"))
+
+	// Dump JSON
+	b, err := json.MarshalIndent(indexData, "", "\t")
+	if err != nil {
+		return err
+	}
+	log.Output(string(b))
 
 	return nil
 }

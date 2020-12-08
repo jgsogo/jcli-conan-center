@@ -13,8 +13,8 @@ type Package struct {
 	PackageID       string            `json:"package_id"`
 	Version         string            `json:"version"`
 	PackageRevision string            `json:"package_revision"`
-	Settings        map[string]string `json:"settings"`
-	Requires        []string          `json:"requires"`
+	Settings        map[string]string `json:"settings,omitempty"`
+	Requires        []string          `json:"requires,omitempty"`
 }
 
 // NewPackageUsingProperties creates a `Package` instance and initializes its members
@@ -29,10 +29,14 @@ func NewPackageUsingProperties(pkg types.Package, props []servicesUtils.Property
 		prop := props[i]
 		switch key := prop.Key; key {
 		case "settings":
-			s := strings.SplitN(prop.Value, "=", 2)
-			packageData.AddSetting(s[0], s[1])
+			if len(prop.Value) > 0 {
+				s := strings.SplitN(prop.Value, "=", 2)
+				packageData.AddSetting(s[0], s[1])
+			}
 		case "requires":
-			packageData.Requires = append(packageData.Requires, prop.Value)
+			if len(prop.Value) > 0 {
+				packageData.Requires = append(packageData.Requires, prop.Value)
+			}
 		}
 	}
 	return packageData
