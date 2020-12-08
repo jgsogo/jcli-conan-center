@@ -47,3 +47,37 @@ func TestPackage(t *testing.T) {
 	assert.Equal(t, conanPackage.RtPath(true), "_/name/version/_/rrev/package/pkgId/prev")
 	assert.Equal(t, conanPackage.RtPath(false), "_/name/version/_/rrev/package/pkgId")
 }
+
+func TestParseStringReference(t *testing.T) {
+	ref, err := ParseStringReference("name/version")
+	assert.Nil(t, err)
+	assert.Equal(t, "name", ref.Name)
+	assert.Equal(t, "version", ref.Version)
+	assert.Nil(t, ref.User)
+	assert.Nil(t, ref.Channel)
+	assert.Equal(t, "", ref.Revision)
+
+	ref, err = ParseStringReference("name/version@user/channel")
+	assert.Nil(t, err)
+	assert.Equal(t, "name", ref.Name)
+	assert.Equal(t, "version", ref.Version)
+	assert.Equal(t, "user", *ref.User)
+	assert.Equal(t, "channel", *ref.Channel)
+	assert.Equal(t, "", ref.Revision) // TODO: Think about a better value when it has no value.
+
+	ref, err = ParseStringReference("name/version#rrev")
+	assert.Nil(t, err)
+	assert.Equal(t, "name", ref.Name)
+	assert.Equal(t, "version", ref.Version)
+	assert.Nil(t, ref.User)
+	assert.Nil(t, ref.Channel)
+	assert.Equal(t, "rrev", ref.Revision)
+
+	ref, err = ParseStringReference("name/version@user/channel#rrev")
+	assert.Nil(t, err)
+	assert.Equal(t, "name", ref.Name)
+	assert.Equal(t, "version", ref.Version)
+	assert.Equal(t, "user", *ref.User)
+	assert.Equal(t, "channel", *ref.Channel)
+	assert.Equal(t, "rrev", ref.Revision)
+}
