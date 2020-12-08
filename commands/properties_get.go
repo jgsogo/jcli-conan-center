@@ -9,11 +9,11 @@ import (
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands"
 	"github.com/jfrog/jfrog-cli-core/artifactory/utils"
 	"github.com/jfrog/jfrog-cli-core/plugins/components"
+	"github.com/jfrog/jfrog-client-go/artifactory/services"
+	servicesUtils "github.com/jfrog/jfrog-client-go/artifactory/services/utils"
 	"github.com/jfrog/jfrog-client-go/utils/log"
 	"github.com/jgsogo/jcli-conan-center/search"
 	"github.com/jgsogo/jcli-conan-center/types"
-	"github.com/jfrog/jfrog-client-go/artifactory/services"
-	servicesUtils "github.com/jfrog/jfrog-client-go/artifactory/services/utils"
 )
 
 // GetPropertiesGetCommand returns object description for the command 'properties'
@@ -68,7 +68,7 @@ func parseReference(reference string) types.Reference {
 			panic("Provided reference contains 'channel' or 'user', but not both!")
 		}
 		return types.Reference{Name: name, Version: version, User: nil, Channel: nil, Revision: revision}
-	} 
+	}
 	return types.Reference{Name: name, Version: version, User: &user, Channel: &channel, Revision: revision}
 }
 
@@ -118,7 +118,7 @@ func propertiesGetCmd(c *components.Context) error {
 
 	// Get properties for the given reference
 	params := services.NewSearchParams()
-	params.Pattern = repository + "/" + rtReference.RtPath(true)  // Trailing slash
+	params.Pattern = repository + "/" + rtReference.RtPath(true) // Trailing slash
 	params.Recursive = false
 	params.IncludeDirs = true
 
@@ -136,7 +136,6 @@ func propertiesGetCmd(c *components.Context) error {
 			log.Output(fmt.Sprintf("  %s: %s", prop.Key, prop.Value))
 		}
 	}
-
 
 	return nil
 }
