@@ -41,5 +41,9 @@ func TestPackage(t *testing.T) {
 	reference := Reference{"name", "version", nil, nil, "rrev"}
 	conanPackage := Package{Ref: reference, PackageId: "pkgId", Revision: "prev"}
 
+	assert.Equal(t, conanPackage.ToString(true), "name/version#rrev:pkgId#prev")
+	assert.Equal(t, conanPackage.ToString(false), "name/version:pkgId")
 	assert.Equal(t, conanPackage.String(), "name/version#rrev:pkgId#prev")
+	assert.Equal(t, conanPackage.RtPath(true), "_/name/version/_/rrev/package/pkgId/prev")
+	assert.Equal(t, conanPackage.RtPath(false), "_/name/version/_/rrev/package/pkgId")
 }
