@@ -25,5 +25,6 @@ func getCommands() []components.Command {
 		commands.GetHelloCommand(),
 		commands.GetStatsCommand(),
 		commands.GetSearchCommand(),
+		commands.GetPropertiesGetCommand(),
 	}
 }
