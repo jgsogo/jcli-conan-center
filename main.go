@@ -14,7 +14,7 @@ func main() {
 func getApp() components.App {
 	app := components.App{}
 	app.Name = "conan-center"
-	app.Description = "Manage Conan repository."
+	app.Description = "Manage Conan repository (ConanCenter like)."
 	app.Version = "v0.1.0"
 	app.Commands = getCommands()
 	return app
@@ -22,8 +22,8 @@ func getApp() components.App {
 
 func getCommands() []components.Command {
 	return []components.Command{
-		commands.GetHelloCommand(),
 		commands.GetStatsCommand(),
 		commands.GetSearchCommand(),
+		commands.GetPropertiesGetCommand(),
 	}
 }

@@ -3,12 +3,31 @@ package types
 import (
 	"fmt"
 	"strings"
+	"regexp"
 )
 
 const (
 	ValidConanChars       = `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
 	FilesystemPlaceHolder = "_"
 )
+
+func ParseStringReference(reference string) (*Reference, error) {
+	referencePattern := regexp.MustCompile(`^(?P<name>` + ValidConanChars + `+)\/(?P<version>` + ValidConanChars + `+)(@(?P<user>` + ValidConanChars + `+)\/(?P<channel>` + ValidConanChars + `+))?(#(?P<revision>[a-z0-9]+))?$`)
+	m := referencePattern.FindStringSubmatch(reference)
+	if m == nil {
+		return nil, fmt.Errorf("String '%s' doesn't match a Conan reference", reference)
+	}
+	name := m[1]
+	version := m[2]
+	user := m[4]
+	channel := m[5]
+	revision := m[7]
+
+	if user == "" || channel == "" {
+		return &Reference{Name: name, Version: version, User: nil, Channel: nil, Revision: revision}, nil
+	}
+	return &Reference{Name: name, Version: version, User: &user, Channel: &channel, Revision: revision}, nil
+}
 
 type Reference struct {
 	Name     string
@@ -17,14 +36,6 @@ type Reference struct {
 	Channel  *string
 	Revision string
 }
-
-//func MakeReference(name string, version string, revision string) Reference {
-//	return Reference{name, version, "_", "_", revision}
-//}
-
-//func MakeReference(name string, version string, user *string, channel *string, revision string) Reference {
-//	return Reference{name, version, user, channel, revision}
-//}
 
 func (ref *Reference) ToString(withRevision bool) string {
 	var ret string
@@ -72,10 +83,21 @@ type Package struct {
 }
 
 func (pkg *Package) String() string {
-	return fmt.Sprintf("%s:%s#%s", pkg.Ref.String(), pkg.PackageId, pkg.Revision)
+	return pkg.ToString(true)
 }
 
-//func (pkg *Package) RtPath() string {
-//	str := []string{pkg.Ref.rtPath(), "package", pkg.PackageId, pkg.Revision}
-//	return strings.Join(str, "/")
-//}
+func (pkg *Package) ToString(withRevision bool) string {
+	ret := pkg.Ref.ToString(withRevision) + ":" + pkg.PackageId
+	if withRevision {
+		ret = ret + "#" + pkg.Revision
+	}
+	return ret
+}
+
+func (pkg *Package) RtPath(withRevision bool) string {
+	str := []string{pkg.Ref.RtPath(true), "package", pkg.PackageId}
+	if withRevision {
+		str = append(str, pkg.Revision)
+	}
+	return strings.Join(str, "/")
+}

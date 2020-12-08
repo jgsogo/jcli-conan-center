@@ -1,0 +1,84 @@
+{
+    "results": [
+        {
+            "repo": "conan-center",
+            "path": "_/b2/4.3.0/_/ec8af29b790f5745890470ce4220ed50/package/ca33edce272a279b24f87dc0d4cf5bbdcffbc187",
+            "name": "2904158bb9b96db13de732f1c8ca4b64",
+            "type": "folder",
+            "size": 0,
+            "created": "2020-11-08T01:08:54.511Z",
+            "modified": "2020-11-08T01:08:54.511Z",
+            "properties": [
+                {
+                    "key": "license",
+                    "value": "BSL-1.0"
+                },
+                {
+                    "key": "options"
+                },
+                {
+                    "key": "settings",
+                    "value": "arch=x86_64"
+                },
+                {
+                    "key": "settings",
+                    "value": "build_type=Release"
+                },
+                {
+                    "key": "provides"
+                },
+                {
+                    "key": "settings",
+                    "value": "arch_build=x86_64"
+                },
+                {
+                    "key": "topics",
+                    "value": "builder"
+                },
+                {
+                    "key": "settings",
+                    "value": "compiler.version=14"
+                },
+                {
+                    "key": "settings",
+                    "value": "os=Windows"
+                },
+                {
+                    "key": "topics",
+                    "value": "conan"
+                },
+                {
+                    "key": "settings",
+                    "value": "os_build=Windows"
+                },
+                {
+                    "key": "settings",
+                    "value": "compiler=Visual Studio"
+                },
+                {
+                    "key": "topics",
+                    "value": "installer"
+                },
+                {
+                    "key": "topics",
+                    "value": "boost"
+                },
+                {
+                    "key": "requires"
+                },
+                {
+                    "key": "full_requires"
+                },
+                {
+                    "key": "settings",
+                    "value": "compiler.runtime=MT"
+                }
+            ]
+        }
+    ],
+    "range": {
+        "start_pos": 0,
+        "end_pos": 1,
+        "total": 1
+    }
+}
