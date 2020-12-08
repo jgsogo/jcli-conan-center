@@ -59,24 +59,6 @@ func getPropertiesGetArguments() []components.Argument {
 	}
 }
 
-func parseReference(reference string) types.Reference {
-	referencePattern := regexp.MustCompile(`(?P<name>` + types.ValidConanChars + `*)\/(?P<version>` + types.ValidConanChars + `+)(@(?P<user>` + types.ValidConanChars + `+)\/(?P<channel>` + types.ValidConanChars + `*))?(#(?P<revision>[a-z0-9]+))?`)
-	m := referencePattern.FindStringSubmatch(reference)
-	name := m[1]
-	version := m[2]
-	user := m[4]
-	channel := m[5]
-	revision := m[7]
-
-	if user == "" || channel == "" {
-		if channel != "" || user != "" {
-			panic("Provided reference contains 'channel' or 'user', but not both!")
-		}
-		return types.Reference{Name: name, Version: version, User: nil, Channel: nil, Revision: revision}
-	}
-	return types.Reference{Name: name, Version: version, User: &user, Channel: &channel, Revision: revision}
-}
-
 func readProperties(serviceManager artifactory.ArtifactoryServicesManager, repository string, rtPath string) ([]servicesUtils.Property, error) {
 	// Get properties for the given reference
 	params := services.NewSearchParams()
@@ -130,7 +112,10 @@ func propertiesGetCmd(c *components.Context) error {
 	log.Info(fmt.Sprintf(" - input reference: %s", reference))
 
 	// Search for the specific revision in the repository
-	rtReference := parseReference(reference)
+	rtReference, err := types.ParseStringReference(reference)
+	if err != nil {
+		return err
+	}
 	if rtReference.Revision == "" { // Search for the latest revision
 		rtRevisions, err := search.ParseRevisions(serviceManager, repository+"/"+rtReference.RtPath(false)+"/index.json")
 		if err != nil {

@@ -3,12 +3,31 @@ package types
 import (
 	"fmt"
 	"strings"
+	"regexp"
 )
 
 const (
 	ValidConanChars       = `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
 	FilesystemPlaceHolder = "_"
 )
+
+func ParseStringReference(reference string) (Reference, error) {
+	referencePattern := regexp.MustCompile(`(?P<name>` + ValidConanChars + `*)\/(?P<version>` + ValidConanChars + `+)(@(?P<user>` + ValidConanChars + `+)\/(?P<channel>` + ValidConanChars + `*))?(#(?P<revision>[a-z0-9]+))?`)
+	m := referencePattern.FindStringSubmatch(reference)
+	name := m[1]
+	version := m[2]
+	user := m[4]
+	channel := m[5]
+	revision := m[7]
+
+	if user == "" || channel == "" {
+		if channel != "" || user != "" {
+			panic("Provided reference contains 'channel' or 'user', but not both!")
+		}
+		return Reference{Name: name, Version: version, User: nil, Channel: nil, Revision: revision}, nil
+	}
+	return Reference{Name: name, Version: version, User: &user, Channel: &channel, Revision: revision}, nil
+}
 
 type Reference struct {
 	Name     string
