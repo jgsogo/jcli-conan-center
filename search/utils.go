@@ -52,7 +52,6 @@ func RunSearch(servicesManager artifactory.ArtifactoryServicesManager, searchPar
 }
 
 func readProperties(serviceManager artifactory.ArtifactoryServicesManager, repository string, path string) ([]servicesUtils.Property, error) {
-	// Get properties for the given reference
 	params := services.NewSearchParams()
 	params.Pattern = repository + "/" + path
 	params.Recursive = false
