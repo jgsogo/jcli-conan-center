@@ -12,6 +12,7 @@ import (
 	"github.com/jgsogo/jcli-conan-center/search"
 )
 
+// GetSearchCommand returns object description for the command 'search'
 func GetSearchCommand() components.Command {
 	return components.Command{
 		Name:        "search",

@@ -1,0 +1,85 @@
+{
+    "results": [
+        {
+            "repo": "conan-center",
+            "path": "_/b2/4.3.0/_",
+            "name": "ec8af29b790f5745890470ce4220ed50",
+            "type": "folder",
+            "size": 0,
+            "created": "2020-11-08T01:08:39.868Z",
+            "modified": "2020-11-08T01:08:39.868Z",
+            "properties": [
+                {
+                    "key": "topics",
+                    "value": "conan"
+                },
+                {
+                    "key": "topics",
+                    "value": "builder"
+                },
+                {
+                    "key": "settings",
+                    "value": "os"
+                },
+                {
+                    "key": "url",
+                    "value": "https://github.com/conan-io/conan-center-index"
+                },
+                {
+                    "key": "options",
+                    "value": "use_cxx_env"
+                },
+                {
+                    "key": "license",
+                    "value": "BSL-1.0"
+                },
+                {
+                    "key": "settings",
+                    "value": "arch"
+                },
+                {
+                    "key": "topics",
+                    "value": "boost"
+                },
+                {
+                    "key": "version",
+                    "value": "4.3.0"
+                },
+                {
+                    "key": "deprecated"
+                },
+                {
+                    "key": "options",
+                    "value": "toolset"
+                },
+                {
+                    "key": "name",
+                    "value": "b2"
+                },
+                {
+                    "key": "channel"
+                },
+                {
+                    "key": "description",
+                    "value": "B2 makes it easy to build C++ projects, everywhere."
+                },
+                {
+                    "key": "topics",
+                    "value": "installer"
+                },
+                {
+                    "key": "homepage",
+                    "value": "https://boostorg.github.io/build/"
+                },
+                {
+                    "key": "user"
+                }
+            ]
+        }
+    ],
+    "range": {
+        "start_pos": 0,
+        "end_pos": 1,
+        "total": 1
+    }
+}
