@@ -113,6 +113,7 @@ func TestReadReferenceProperties(t *testing.T) {
 
 	otherRef := types.Reference{Name: "other", Version: "version", User: nil, Channel: nil, Revision: "rrev"}
 	props, err = ReadReferenceProperties(&servicesManager, "repository", otherRef)
+	assert.Nil(t, props)
 	assert.NotNil(t, err)
 	assert.Equal(t, "Properties for reference '_/other/version/_/rrev' not found", err.Error())
 }
@@ -129,6 +130,7 @@ func TestReadPackageProperties(t *testing.T) {
 
 	otherpkg := types.Package{Ref: reference, PackageId: "otherID", Revision: "prev"}
 	props, err = ReadPackageProperties(&servicesManager, "repository", otherpkg)
+	assert.Nil(t, props)
 	assert.NotNil(t, err)
 	assert.Equal(t, "Properties for package '_/name/version/_/rrev/package/otherID/prev' not found", err.Error())
 }
