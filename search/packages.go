@@ -1,3 +1,4 @@
+// Package search contains functionality to search references and packages in Artifactory.
 package search
 
 import (
