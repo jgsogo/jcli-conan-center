@@ -2,6 +2,7 @@
 
 ![Test Across Matrix](https://github.com/jgsogo/jcli-conan-center/workflows/Test%20Across%20Matrix/badge.svg?branch=master)
 ![Lint Go Code](https://github.com/jgsogo/jcli-conan-center/workflows/Lint%20Go%20Code/badge.svg?branch=master)
+[![Go Reference](https://pkg.go.dev/badge/github.com/jgsogo/jcli-conan-center.svg)](https://pkg.go.dev/github.com/jgsogo/jcli-conan-center)
 [![codecov](https://codecov.io/gh/jgsogo/jcli-conan-center/branch/master/graph/badge.svg)](https://codecov.io/gh/jgsogo/jcli-conan-center)
 
 ## About this plugin
