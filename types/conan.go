@@ -24,9 +24,6 @@ func ParseStringReference(reference string) (*Reference, error) {
 	revision := m[7]
 
 	if user == "" || channel == "" {
-		if channel != "" || user != "" {
-			panic("Provided reference contains 'channel' or 'user', but not both!")
-		}
 		return &Reference{Name: name, Version: version, User: nil, Channel: nil, Revision: revision}, nil
 	}
 	return &Reference{Name: name, Version: version, User: &user, Channel: &channel, Revision: revision}, nil
