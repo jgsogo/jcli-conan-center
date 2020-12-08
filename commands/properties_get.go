@@ -3,17 +3,17 @@ package commands
 import (
 	"errors"
 	"fmt"
+	"regexp"
+	"strconv"
+
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands"
 	"github.com/jfrog/jfrog-cli-core/artifactory/utils"
 	"github.com/jfrog/jfrog-cli-core/plugins/components"
-	"github.com/jfrog/jfrog-client-go/artifactory"
 	"github.com/jfrog/jfrog-client-go/artifactory/services"
 	servicesUtils "github.com/jfrog/jfrog-client-go/artifactory/services/utils"
 	"github.com/jfrog/jfrog-client-go/utils/log"
 	"github.com/jgsogo/jcli-conan-center/search"
 	"github.com/jgsogo/jcli-conan-center/types"
-	"regexp"
-	"strconv"
 )
 
 // GetPropertiesGetCommand returns object description for the command 'properties'
@@ -57,25 +57,6 @@ func getPropertiesGetArguments() []components.Argument {
 			Description: "Conan reference to work with (use v2 style, without trailing @). If no revision is given, it will use latest one",
 		},
 	}
-}
-
-func readProperties(serviceManager artifactory.ArtifactoryServicesManager, repository string, rtPath string) ([]servicesUtils.Property, error) {
-	// Get properties for the given reference
-	params := services.NewSearchParams()
-	params.Pattern = repository + "/" + rtPath
-	params.Recursive = false
-	params.IncludeDirs = true
-
-	reader, err := search.RunSearch(serviceManager, params)
-	if err != nil {
-		return nil, err
-	}
-	defer reader.Close()
-
-	for resultItem := new(servicesUtils.ResultItem); reader.NextRecord(resultItem) == nil; resultItem = new(servicesUtils.ResultItem) {
-		return resultItem.Properties, nil
-	}
-	panic(fmt.Sprintf("Properties for '%s' not found!", rtPath))
 }
 
 func propertiesGetCmd(c *components.Context) error {
@@ -126,7 +107,7 @@ func propertiesGetCmd(c *components.Context) error {
 	log.Info(" - working reference:", rtReference.ToString(true))
 
 	// Get properties for the given reference
-	properties, err := readProperties(serviceManager, repository, rtReference.RtPath(true))
+	properties, err := search.ReadReferenceProperties(serviceManager, repository, rtReference)
 	if err != nil {
 		return err
 	}
@@ -155,7 +136,7 @@ func propertiesGetCmd(c *components.Context) error {
 		for resultItem := new(servicesUtils.ResultItem); reader.NextRecord(resultItem) == nil; resultItem = new(servicesUtils.ResultItem) {
 			m := pkgPattern.FindStringSubmatch(resultItem.Path)
 			pkgReference := types.Package{Ref: rtReference, PackageId: m[1], Revision: m[2]}
-			properties, err := readProperties(serviceManager, repository, pkgReference.RtPath(true))
+			properties, err := search.ReadPackageProperties(serviceManager, repository, pkgReference)
 			if err != nil {
 				return err
 			}
