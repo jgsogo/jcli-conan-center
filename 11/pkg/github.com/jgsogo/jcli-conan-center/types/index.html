@@ -93,7 +93,13 @@
 			</div>
 			<div class="expanded">
 				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
-				
+				<p>
+Package types provides basic types to work with Conan items: references and packages.
+</p>
+<p>
+Package types provides some abstraction over some data returned by JFrog Artifactory.
+</p>
+
 				
 			</div>
 		</div>
@@ -203,10 +209,13 @@
 		
 			<h2 id="pkg-constants">Constants</h2>
 			
-				
+				<p>
+Constants to be used with Conan elements.
+</p>
+
 				<pre>const (
-    <span id="ValidConanChars">ValidConanChars</span>       = `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
-    <span id="FilesystemPlaceHolder">FilesystemPlaceHolder</span> = &#34;_&#34;
+    <span id="ValidConanChars">ValidConanChars</span>       = `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]` <span class="comment">// Validates (regex) a part from a Conan reference</span>
+    <span id="FilesystemPlaceHolder">FilesystemPlaceHolder</span> = &#34;_&#34;                             <span class="comment">// Filesystem representation of a null user or null channel in a Conan reference.</span>
 )</pre>
 			
 		
@@ -215,12 +224,15 @@
 		
 			
 			
-			<h2 id="ByTime">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=523:552#L22">ByTime</a>
+			<h2 id="ByTime">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=1022:1051#L28">ByTime</a>
 				<a class="permalink" href="#ByTime">&#xb6;</a>
 				
 				
 			</h2>
-			
+			<p>
+ByTime is a helper operator to order revisions by date.
+</p>
+
 			<pre>type ByTime []<a href="#RtRevisionsData">RtRevisionsData</a></pre>
 
 			
@@ -235,7 +247,7 @@
 
 			
 				
-				<h3 id="ByTime.Len">func (ByTime) <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=554:579#L24">Len</a>
+				<h3 id="ByTime.Len">func (ByTime) <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=1053:1078#L30">Len</a>
 					<a class="permalink" href="#ByTime.Len">&#xb6;</a>
 					
 					
@@ -247,7 +259,7 @@
 				
 			
 				
-				<h3 id="ByTime.Less">func (ByTime) <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=672:707#L26">Less</a>
+				<h3 id="ByTime.Less">func (ByTime) <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=1171:1206#L32">Less</a>
 					<a class="permalink" href="#ByTime.Less">&#xb6;</a>
 					
 					
@@ -259,7 +271,7 @@
 				
 			
 				
-				<h3 id="ByTime.Swap">func (ByTime) <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=608:638#L25">Swap</a>
+				<h3 id="ByTime.Swap">func (ByTime) <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=1107:1137#L31">Swap</a>
 					<a class="permalink" href="#ByTime.Swap">&#xb6;</a>
 					
 					
@@ -273,12 +285,15 @@
 		
 			
 			
-			<h2 id="Package">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=1844:1924#L69">Package</a>
+			<h2 id="Package">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=2972:3052#L81">Package</a>
 				<a class="permalink" href="#Package">&#xb6;</a>
 				
 				
 			</h2>
-			
+			<p>
+Package represents a Conan package with its `Reference`, the package ID and the package revision.
+</p>
+
 			<pre>type Package struct {
 <span id="Package.Ref"></span>    Ref       <a href="#Reference">Reference</a>
 <span id="Package.PackageId"></span>    PackageId <a href="/pkg/builtin/#string">string</a>
@@ -298,19 +313,24 @@
 
 			
 				
-				<h3 id="Package.RtPath">func (*Package) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=2182:2234#L87">RtPath</a>
+				<h3 id="Package.RtPath">func (*Package) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=3724:3776#L104">RtPath</a>
 					<a class="permalink" href="#Package.RtPath">&#xb6;</a>
 					
 					
 				</h3>
 				<pre>func (pkg *<a href="#Package">Package</a>) RtPath(withRevision <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#string">string</a></pre>
-				
+				<p>
+RtPath returns the path inside Artifactory to the `Package`. It can be considered with
+or without revisions (last element in the Artifactory path). However, not that the recipe
+will always contain the revision, as it is an element in the middle of the path.
+</p>
+
 				
 				
 				
 			
 				
-				<h3 id="Package.String">func (*Package) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=1926:1961#L75">String</a>
+				<h3 id="Package.String">func (*Package) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=3054:3089#L87">String</a>
 					<a class="permalink" href="#Package.String">&#xb6;</a>
 					
 					
@@ -322,13 +342,17 @@
 				
 			
 				
-				<h3 id="Package.ToString">func (*Package) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=1994:2048#L79">ToString</a>
+				<h3 id="Package.ToString">func (*Package) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=3268:3322#L93">ToString</a>
 					<a class="permalink" href="#Package.ToString">&#xb6;</a>
 					
 					
 				</h3>
 				<pre>func (pkg *<a href="#Package">Package</a>) ToString(withRevision <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#string">string</a></pre>
-				
+				<p>
+ToString returns the string representation of the Conan package. Use the argument `withRevision` to add or not the
+revisions to the output.
+</p>
+
 				
 				
 				
@@ -336,12 +360,16 @@
 		
 			
 			
-			<h2 id="Reference">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=922:1034#L22">Reference</a>
+			<h2 id="Reference">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=1588:1700#L28">Reference</a>
 				<a class="permalink" href="#Reference">&#xb6;</a>
 				
 				
 			</h2>
-			
+			<p>
+Reference represents a Conan reference with its parts: name, version, user, channel and revision. Only the attributes
+`Channel` and `User` are optional in a valid reference.
+</p>
+
 			<pre>type Reference struct {
 <span id="Reference.Name"></span>    Name     <a href="/pkg/builtin/#string">string</a>
 <span id="Reference.Version"></span>    Version  <a href="/pkg/builtin/#string">string</a>
@@ -361,50 +389,65 @@
 
 			
 				
-				<h3 id="ParseStringReference">func <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=152:215#L4">ParseStringReference</a>
+				<h3 id="ParseStringReference">func <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=638:701#L8">ParseStringReference</a>
 					<a class="permalink" href="#ParseStringReference">&#xb6;</a>
 					
 					
 				</h3>
 				<pre>func ParseStringReference(reference <a href="/pkg/builtin/#string">string</a>) (*<a href="#Reference">Reference</a>, <a href="/pkg/builtin/#error">error</a>)</pre>
-				
+				<p>
+ParseStringReference parses a string and returns a Conan reference. The string can have any of these formats: name/version,
+name/version@user/channel, name/version#revision, name/version@user/channel#revision.
+</p>
+
 				
 				
 			
 
 			
 				
-				<h3 id="Reference.RtPath">func (*Reference) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=1421:1475#L47">RtPath</a>
+				<h3 id="Reference.RtPath">func (*Reference) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=2448:2502#L58">RtPath</a>
 					<a class="permalink" href="#Reference.RtPath">&#xb6;</a>
 					
 					
 				</h3>
 				<pre>func (ref *<a href="#Reference">Reference</a>) RtPath(withRevision <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#string">string</a></pre>
-				
+				<p>
+RtPath returns the path inside Artifactory to the `Reference`. It can be considered with
+or without revisions (latest element in the Artifactory path).
+</p>
+
 				
 				
 				
 			
 				
-				<h3 id="Reference.String">func (*Reference) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=1351:1388#L43">String</a>
+				<h3 id="Reference.String">func (*Reference) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=2219:2256#L52">String</a>
 					<a class="permalink" href="#Reference.String">&#xb6;</a>
 					
 					
 				</h3>
 				<pre>func (ref *<a href="#Reference">Reference</a>) String() <a href="/pkg/builtin/#string">string</a></pre>
-				
+				<p>
+String converts to string the reference (with revisions).
+</p>
+
 				
 				
 				
 			
 				
-				<h3 id="Reference.ToString">func (*Reference) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=1036:1092#L30">ToString</a>
+				<h3 id="Reference.ToString">func (*Reference) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=1843:1899#L38">ToString</a>
 					<a class="permalink" href="#Reference.ToString">&#xb6;</a>
 					
 					
 				</h3>
 				<pre>func (ref *<a href="#Reference">Reference</a>) ToString(withRevision <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#string">string</a></pre>
-				
+				<p>
+ToString returns a string representation of the `Reference`. Use the argument `withRevision` to add or not the
+revision to the output.
+</p>
+
 				
 				
 				
@@ -412,12 +455,15 @@
 		
 			
 			
-			<h2 id="RtIndexJSON">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=753:829#L28">RtIndexJSON</a>
+			<h2 id="RtIndexJSON">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=1356:1432#L35">RtIndexJSON</a>
 				<a class="permalink" href="#RtIndexJSON">&#xb6;</a>
 				
 				
 			</h2>
-			
+			<p>
+RtIndexJSON represents the JSON where Artifactory stores Conan revisions (using &#39;index.json&#39; files).
+</p>
+
 			<pre>type RtIndexJSON struct {
     <span class="comment">//Reference string</span>
 <span id="RtIndexJSON.Revisions"></span>    Revisions []<a href="#RtRevisionsData">RtRevisionsData</a>
@@ -438,12 +484,15 @@
 		
 			
 			
-			<h2 id="RtRevisionsData">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=451:521#L17">RtRevisionsData</a>
+			<h2 id="RtRevisionsData">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=891:961#L22">RtRevisionsData</a>
 				<a class="permalink" href="#RtRevisionsData">&#xb6;</a>
 				
 				
 			</h2>
-			
+			<p>
+RtRevisionsData represents the data associated to a Conan revision in Artifactory.
+</p>
+
 			<pre>type RtRevisionsData struct {
 <span id="RtRevisionsData.Revision"></span>    Revision <a href="/pkg/builtin/#string">string</a>
 <span id="RtRevisionsData.Time"></span>    Time     <a href="#RtTimestamp">RtTimestamp</a>
@@ -464,12 +513,16 @@
 		
 			
 			
-			<h2 id="RtTimestamp">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=102:140#L2">RtTimestamp</a>
+			<h2 id="RtTimestamp">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=371:409#L5">RtTimestamp</a>
 				<a class="permalink" href="#RtTimestamp">&#xb6;</a>
 				
 				
 			</h2>
-			
+			<p>
+RtTimestamp represents a custom timestamp using format &#39;2006-01-02T15:04:05.999+0000&#39;. It allows
+serializing and deserializing using the representation used by Artifactory.
+</p>
+
 			<pre>type RtTimestamp struct {
     <a href="/pkg/time/">time</a>.<a href="/pkg/time/#Time">Time</a>
 }
@@ -487,13 +540,16 @@
 
 			
 				
-				<h3 id="RtTimestamp.UnmarshalJSON">func (*RtTimestamp) <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=142:200#L6">UnmarshalJSON</a>
+				<h3 id="RtTimestamp.UnmarshalJSON">func (*RtTimestamp) <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=496:554#L10">UnmarshalJSON</a>
 					<a class="permalink" href="#RtTimestamp.UnmarshalJSON">&#xb6;</a>
 					
 					
 				</h3>
 				<pre>func (ct *<a href="#RtTimestamp">RtTimestamp</a>) UnmarshalJSON(b []<a href="/pkg/builtin/#byte">byte</a>) (err <a href="/pkg/builtin/#error">error</a>)</pre>
-				
+				<p>
+UnmarshalJSON overrides parsing from JSON a timestamp using the RtTimestamp type.
+</p>
+
 				
 				
 				

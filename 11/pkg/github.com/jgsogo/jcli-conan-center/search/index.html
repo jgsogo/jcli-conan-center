@@ -163,91 +163,115 @@
 		
 			
 			
-			<h2 id="ParseRevisions">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=550:675#L16">ParseRevisions</a>
+			<h2 id="ParseRevisions">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=795:920#L18">ParseRevisions</a>
 				<a class="permalink" href="#ParseRevisions">&#xb6;</a>
 				
 				
 			</h2>
 			<pre>func ParseRevisions(serviceManager <a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/">artifactory</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/#ArtifactoryServicesManager">ArtifactoryServicesManager</a>, indexPath <a href="/pkg/builtin/#string">string</a>) ([]<a href="/pkg/github.com/jgsogo/jcli-conan-center/types/">types</a>.<a href="/pkg/github.com/jgsogo/jcli-conan-center/types/#RtRevisionsData">RtRevisionsData</a>, <a href="/pkg/builtin/#error">error</a>)</pre>
-			
+			<p>
+ParseRevisions parses and &#39;index.json&#39; file stored in Artifactory and returns a sorted list of revisions.
+</p>
+
 			
 			
 
 		
 			
 			
-			<h2 id="ReadPackageProperties">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=2367:2520#L71">ReadPackageProperties</a>
+			<h2 id="ReadPackageProperties">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=2901:3054#L76">ReadPackageProperties</a>
 				<a class="permalink" href="#ReadPackageProperties">&#xb6;</a>
 				
 				
 			</h2>
 			<pre>func ReadPackageProperties(serviceManager <a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/">artifactory</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/#ArtifactoryServicesManager">ArtifactoryServicesManager</a>, repository <a href="/pkg/builtin/#string">string</a>, pkg <a href="/pkg/github.com/jgsogo/jcli-conan-center/types/">types</a>.<a href="/pkg/github.com/jgsogo/jcli-conan-center/types/#Package">Package</a>) ([]<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/services/utils/">servicesUtils</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/services/utils/#Property">Property</a>, <a href="/pkg/builtin/#error">error</a>)</pre>
-			
+			<p>
+ReadPackageProperties returns the properties for a given Conan package `pkg` in the given `repository`.
+</p>
+
 			
 			
 
 		
 			
 			
-			<h2 id="ReadReferenceProperties">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=2003:2160#L63">ReadReferenceProperties</a>
+			<h2 id="ReadReferenceProperties">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=2430:2587#L67">ReadReferenceProperties</a>
 				<a class="permalink" href="#ReadReferenceProperties">&#xb6;</a>
 				
 				
 			</h2>
 			<pre>func ReadReferenceProperties(serviceManager <a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/">artifactory</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/#ArtifactoryServicesManager">ArtifactoryServicesManager</a>, repository <a href="/pkg/builtin/#string">string</a>, ref <a href="/pkg/github.com/jgsogo/jcli-conan-center/types/">types</a>.<a href="/pkg/github.com/jgsogo/jcli-conan-center/types/#Reference">Reference</a>) ([]<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/services/utils/">servicesUtils</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/services/utils/#Property">Property</a>, <a href="/pkg/builtin/#error">error</a>)</pre>
-			
+			<p>
+ReadReferenceProperties returns the properties for a given Conan reference `ref` in the given `repository`.
+</p>
+
 			
 			
 
 		
 			
 			
-			<h2 id="RunSearch">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=1093:1231#L35">RunSearch</a>
+			<h2 id="RunSearch">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=1409:1547#L38">RunSearch</a>
 				<a class="permalink" href="#RunSearch">&#xb6;</a>
 				
 				
 			</h2>
 			<pre>func RunSearch(servicesManager <a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/">artifactory</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/#ArtifactoryServicesManager">ArtifactoryServicesManager</a>, searchParams <a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/services/">services</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/services/#SearchParams">SearchParams</a>) (*<a href="/pkg/github.com/jfrog/jfrog-client-go/utils/io/content/">content</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/utils/io/content/#ContentReader">ContentReader</a>, <a href="/pkg/builtin/#error">error</a>)</pre>
-			
+			<p>
+RunSearch return the content according to the given `searchParams`.
+</p>
+
 			
 			
 
 		
 			
 			
-			<h2 id="Search">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=400:451#L7">Search</a>
+			<h2 id="Search">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/utils.go?s=536:587#L8">Search</a>
 				<a class="permalink" href="#Search">&#xb6;</a>
 				
 				
 			</h2>
 			<pre>func Search(length <a href="/pkg/builtin/#int">int</a>, f func(index <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#int">int</a></pre>
-			
+			<p>
+Search function invokes the given function with the natural numbers from zero to the input `length`. Useful to search into an array.
+</p>
+
 			
 			
 
 		
 			
 			
-			<h2 id="SearchPackages">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/packages.go?s=313:500#L4">SearchPackages</a>
+			<h2 id="SearchPackages">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/packages.go?s=625:812#L7">SearchPackages</a>
 				<a class="permalink" href="#SearchPackages">&#xb6;</a>
 				
 				
 			</h2>
 			<pre>func SearchPackages(serviceManager <a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/">artifactory</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/#ArtifactoryServicesManager">ArtifactoryServicesManager</a>, repository <a href="/pkg/builtin/#string">string</a>, referenceName <a href="/pkg/builtin/#string">string</a>, onlyLatestRecipe <a href="/pkg/builtin/#bool">bool</a>, onlyLatestPackage <a href="/pkg/builtin/#bool">bool</a>) ([]<a href="/pkg/github.com/jgsogo/jcli-conan-center/types/">types</a>.<a href="/pkg/github.com/jgsogo/jcli-conan-center/types/#Package">Package</a>, <a href="/pkg/builtin/#error">error</a>)</pre>
-			
+			<p>
+SearchPackages returns a list of packages matching the `referenceName` in the given `repository`. Use the argument
+`onlyLatestRecipe` to retrieve only packages that belong to the latest revision for each reference, and argument
+`onlyLatestPackage` to retrieve only the latest revision for each package.
+</p>
+
 			
 			
 
 		
 			
 			
-			<h2 id="SearchReferences">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/references.go?s=331:492#L6">SearchReferences</a>
+			<h2 id="SearchReferences">func <a href="/src/github.com/jgsogo/jcli-conan-center/search/references.go?s=526:687#L8">SearchReferences</a>
 				<a class="permalink" href="#SearchReferences">&#xb6;</a>
 				
 				
 			</h2>
 			<pre>func SearchReferences(serviceManager <a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/">artifactory</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/#ArtifactoryServicesManager">ArtifactoryServicesManager</a>, repository <a href="/pkg/builtin/#string">string</a>, referenceName <a href="/pkg/builtin/#string">string</a>, onlyLatest <a href="/pkg/builtin/#bool">bool</a>) ([]<a href="/pkg/github.com/jgsogo/jcli-conan-center/types/">types</a>.<a href="/pkg/github.com/jgsogo/jcli-conan-center/types/#Reference">Reference</a>, <a href="/pkg/builtin/#error">error</a>)</pre>
-			
+			<p>
+SearchReferences returns a list of references matching the `referenceName` in the given `repository`. Use the argument
+`onlyLatest` to retrieve only the latest revision for each reference.
+</p>
+
 			
 			
 
