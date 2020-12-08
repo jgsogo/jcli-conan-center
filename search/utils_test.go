@@ -54,6 +54,17 @@ func (esm *MockArtifactoryServicesManager) SearchFiles(params services.SearchPar
 
 		reader := content.NewContentReader(tmpFile.Name(), "results")
 		return reader, nil
+	} else if params.Pattern == "repository/_/name/version/_/rrev/package/pkgID/prev" {
+		wd, _ := os.Getwd()
+		filePath := filepath.Join(wd, "testdata/search_utils_props_package.json")
+
+		tmpFile, _ := ioutil.TempFile(os.TempDir(), "prefix-")
+		fileContent, _ := ioutil.ReadFile(filePath)
+		_, _ = tmpFile.Write(fileContent)
+		tmpFile.Close()
+
+		reader := content.NewContentReader(tmpFile.Name(), "results")
+		return reader, nil
 	}
 	return nil, nil
 }
@@ -90,4 +101,16 @@ func TestReadReferenceProperties(t *testing.T) {
 	assert.Equal(t, 17, len(props))
 	assert.Equal(t, "topics", props[0].Key)
 	assert.Equal(t, "conan", props[0].Value)
+}
+
+func TestReadPackageProperties(t *testing.T) {
+	servicesManager := MockArtifactoryServicesManager{}
+	reference := types.Reference{Name: "name", Version: "version", User: nil, Channel: nil, Revision: "rrev"}
+	pkg := types.Package{Ref: reference, PackageId: "pkgID", Revision: "prev"}
+	props, err := ReadPackageProperties(&servicesManager, "repository", pkg)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 17, len(props))
+	assert.Equal(t, "license", props[0].Key)
+	assert.Equal(t, "BSL-1.0", props[0].Value)
 }
