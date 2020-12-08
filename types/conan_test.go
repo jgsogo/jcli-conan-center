@@ -94,4 +94,9 @@ func TestParseStringReferenceErrors(t *testing.T) {
 	_, err = ParseStringReference("n/version@")
 	assert.NotNil(t, err)
 	assert.Equal(t, "String 'n/version@' doesn't match a Conan reference", err.Error())
+
+	_, err = ParseStringReference("name/version@u/c")
+	assert.NotNil(t, err)
+	assert.Equal(t, "String 'name/version@u/c' doesn't match a Conan reference", err.Error())
+
 }

@@ -12,7 +12,7 @@ const (
 )
 
 func ParseStringReference(reference string) (*Reference, error) {
-	referencePattern := regexp.MustCompile(`^(?P<name>` + ValidConanChars + `*)\/(?P<version>` + ValidConanChars + `+)(@(?P<user>` + ValidConanChars + `+)\/(?P<channel>` + ValidConanChars + `*))?(#(?P<revision>[a-z0-9]+))?$`)
+	referencePattern := regexp.MustCompile(`^(?P<name>` + ValidConanChars + `+)\/(?P<version>` + ValidConanChars + `+)(@(?P<user>` + ValidConanChars + `+)\/(?P<channel>` + ValidConanChars + `+))?(#(?P<revision>[a-z0-9]+))?$`)
 	m := referencePattern.FindStringSubmatch(reference)
 	if m == nil {
 		return nil, fmt.Errorf("String '%s' doesn't match a Conan reference", reference)
