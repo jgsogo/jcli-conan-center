@@ -11,6 +11,9 @@ import (
 	"github.com/jfrog/jfrog-client-go/utils/log"
 )
 
+// SearchPackages returns a list of packages matching the `referenceName` in the given `repository`. Use the argument
+// `onlyLatestRecipe` to retrieve only packages that belong to the latest revision for each reference, and argument
+// `onlyLatestPackage` to retrieve only the latest revision for each package.
 func SearchPackages(serviceManager artifactory.ArtifactoryServicesManager, repository string, referenceName string, onlyLatestRecipe bool, onlyLatestPackage bool) ([]types.Package, error) {
 	log.Info("Searching packages...")
 

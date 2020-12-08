@@ -13,6 +13,8 @@ import (
 	"github.com/jfrog/jfrog-client-go/utils/log"
 )
 
+// SearchReferences returns a list of references matching the `referenceName` in the given `repository`. Use the argument
+// `onlyLatest` to retrieve only the latest revision for each reference.
 func SearchReferences(serviceManager artifactory.ArtifactoryServicesManager, repository string, referenceName string, onlyLatest bool) ([]types.Reference, error) {
 	log.Info("Searching references...")
 
