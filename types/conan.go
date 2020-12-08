@@ -11,9 +11,12 @@ const (
 	FilesystemPlaceHolder = "_"
 )
 
-func ParseStringReference(reference string) (Reference, error) {
-	referencePattern := regexp.MustCompile(`(?P<name>` + ValidConanChars + `*)\/(?P<version>` + ValidConanChars + `+)(@(?P<user>` + ValidConanChars + `+)\/(?P<channel>` + ValidConanChars + `*))?(#(?P<revision>[a-z0-9]+))?`)
+func ParseStringReference(reference string) (*Reference, error) {
+	referencePattern := regexp.MustCompile(`^(?P<name>` + ValidConanChars + `*)\/(?P<version>` + ValidConanChars + `+)(@(?P<user>` + ValidConanChars + `+)\/(?P<channel>` + ValidConanChars + `*))?(#(?P<revision>[a-z0-9]+))?$`)
 	m := referencePattern.FindStringSubmatch(reference)
+	if m == nil {
+		return nil, fmt.Errorf("String '%s' doesn't match a Conan reference", reference)
+	}
 	name := m[1]
 	version := m[2]
 	user := m[4]
@@ -24,9 +27,9 @@ func ParseStringReference(reference string) (Reference, error) {
 		if channel != "" || user != "" {
 			panic("Provided reference contains 'channel' or 'user', but not both!")
 		}
-		return Reference{Name: name, Version: version, User: nil, Channel: nil, Revision: revision}, nil
+		return &Reference{Name: name, Version: version, User: nil, Channel: nil, Revision: revision}, nil
 	}
-	return Reference{Name: name, Version: version, User: &user, Channel: &channel, Revision: revision}, nil
+	return &Reference{Name: name, Version: version, User: &user, Channel: &channel, Revision: revision}, nil
 }
 
 type Reference struct {

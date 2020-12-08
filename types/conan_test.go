@@ -81,3 +81,17 @@ func TestParseStringReference(t *testing.T) {
 	assert.Equal(t, "channel", *ref.Channel)
 	assert.Equal(t, "rrev", ref.Revision)
 }
+
+func TestParseStringReferenceErrors(t *testing.T) {
+	_, err := ParseStringReference("name/version@")
+	assert.NotNil(t, err)
+	assert.Equal(t, "String 'name/version@' doesn't match a Conan reference", err.Error())
+
+	_, err = ParseStringReference("name/version@#rrev")
+	assert.NotNil(t, err)
+	assert.Equal(t, "String 'name/version@#rrev' doesn't match a Conan reference", err.Error())
+
+	_, err = ParseStringReference("n/version@")
+	assert.NotNil(t, err)
+	assert.Equal(t, "String 'n/version@' doesn't match a Conan reference", err.Error())
+}

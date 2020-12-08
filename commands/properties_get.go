@@ -107,7 +107,7 @@ func propertiesGetCmd(c *components.Context) error {
 	log.Info(" - working reference:", rtReference.ToString(true))
 
 	// Get properties for the given reference
-	properties, err := search.ReadReferenceProperties(serviceManager, repository, rtReference)
+	properties, err := search.ReadReferenceProperties(serviceManager, repository, *rtReference)
 	if err != nil {
 		return err
 	}
@@ -135,7 +135,7 @@ func propertiesGetCmd(c *components.Context) error {
 		pkgPattern := regexp.MustCompile(rtReference.RtPath(true) + "/package/" + `(?P<pkgId>[a-z0-9]*)\/(?P<pkgRev>[a-z0-9]+)`)
 		for resultItem := new(servicesUtils.ResultItem); reader.NextRecord(resultItem) == nil; resultItem = new(servicesUtils.ResultItem) {
 			m := pkgPattern.FindStringSubmatch(resultItem.Path)
-			pkgReference := types.Package{Ref: rtReference, PackageId: m[1], Revision: m[2]}
+			pkgReference := types.Package{Ref: *rtReference, PackageId: m[1], Revision: m[2]}
 			properties, err := search.ReadPackageProperties(serviceManager, repository, pkgReference)
 			if err != nil {
 				return err
