@@ -12,6 +12,8 @@ import (
 	"github.com/jfrog/jfrog-client-go/utils/log"
 	"github.com/jgsogo/jcli-conan-center/search"
 	"github.com/jgsogo/jcli-conan-center/types"
+	"github.com/jfrog/jfrog-client-go/artifactory/services"
+	servicesUtils "github.com/jfrog/jfrog-client-go/artifactory/services/utils"
 )
 
 // GetPropertiesGetCommand returns object description for the command 'properties'
@@ -115,6 +117,26 @@ func propertiesGetCmd(c *components.Context) error {
 	log.Info(" - working reference:", rtReference.ToString(true))
 
 	// Get properties for the given reference
+	params := services.NewSearchParams()
+	params.Pattern = repository + "/" + rtReference.RtPath(true)  // Trailing slash
+	params.Recursive = false
+	params.IncludeDirs = true
+
+	reader, err := search.RunSearch(serviceManager, params)
+	if err != nil {
+		return err
+	}
+	defer reader.Close()
+
+	for resultItem := new(servicesUtils.ResultItem); reader.NextRecord(resultItem) == nil; resultItem = new(servicesUtils.ResultItem) {
+		log.Info(resultItem.Path)
+		log.Output(fmt.Sprintf("Properties for '%s':", rtReference.ToString(true)))
+		for i := range resultItem.Properties {
+			prop := resultItem.Properties[i]
+			log.Output(fmt.Sprintf("  %s: %s", prop.Key, prop.Value))
+		}
+	}
+
 
 	return nil
 }
