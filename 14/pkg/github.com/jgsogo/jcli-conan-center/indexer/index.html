@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>indexer - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="/jcli-conan-center/lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="/jcli-conan-center/lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.13.15";</script>
+<script src="/jcli-conan-center/lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="/pkg/">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="/pkg/">GoDoc</a></div>
+<a href="#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="/search">
+<div id="menu">
+
+<span class="search-box"><input type="search" id="search" name="q" placeholder="Search" aria-label="Search" required><button type="submit"><span><!-- magnifying glass: --><svg width="24" height="24" viewBox="0 0 24 24"><title>submit search</title><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span></button></span>
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package indexer
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "github.com/jgsogo/jcli-conan-center/indexer"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="#pkg-index" class="indexLink">Index</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				<p>
+Package indexer contains the types and functions related to the ConanCenter indexer
+</p>
+
+				
+			</div>
+		</div>
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+			
+			
+			
+				
+				<dd><a href="#IndexData">type IndexData</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#NewFromProperties">func NewFromProperties(ref types.Reference, props []servicesUtils.Property) *IndexData</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#IndexData.SetForce">func (data *IndexData) SetForce(value bool)</a></dd>
+				
+			
+				
+				<dd><a href="#Package">type Package</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#NewPackageUsingProperties">func NewPackageUsingProperties(pkg types.Package, props []servicesUtils.Property) *Package</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Package.AddSetting">func (pkg *Package) AddSetting(key string, value string)</a></dd>
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="/src/github.com/jgsogo/jcli-conan-center/indexer/indexer.go">indexer.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		
+
+		
+		
+		
+		
+			
+			
+			<h2 id="IndexData">type <a href="/src/github.com/jgsogo/jcli-conan-center/indexer/indexer.go?s=1653:2334#L42">IndexData</a>
+				<a class="permalink" href="#IndexData">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+IndexData is the structure with all the information.
+</p>
+
+			<pre>type IndexData struct {
+<span id="IndexData.User"></span>    User           <a href="/pkg/builtin/#string">string</a> `json:&#34;user&#34;`
+<span id="IndexData.Channel"></span>    Channel        <a href="/pkg/builtin/#string">string</a> `json:&#34;channel&#34;`
+<span id="IndexData.RecipeRevision"></span>    RecipeRevision <a href="/pkg/builtin/#string">string</a> `json:&#34;recipe_revision&#34;`
+
+<span id="IndexData.Name"></span>    Name        <a href="/pkg/builtin/#string">string</a> `json:&#34;name,omitempty&#34;`
+<span id="IndexData.Version"></span>    Version     <a href="/pkg/builtin/#string">string</a> `json:&#34;version,omitempty&#34;`
+<span id="IndexData.Description"></span>    Description <a href="/pkg/builtin/#string">string</a> `json:&#34;description,omitempty&#34;`
+<span id="IndexData.License"></span>    License     <a href="/pkg/builtin/#string">string</a> `json:&#34;license,omitempty&#34;`
+<span id="IndexData.Homepage"></span>    Homepage    <a href="/pkg/builtin/#string">string</a> `json:&#34;homepage,omitempty&#34;`
+<span id="IndexData.URL"></span>    URL         <a href="/pkg/builtin/#string">string</a> `json:&#34;giturl,omitempty&#34;`
+<span id="IndexData.Topics"></span>    Topics      <a href="/pkg/builtin/#string">string</a> `json:&#34;topics,omitempty&#34;`
+
+<span id="IndexData.Requires"></span>    Requires []<a href="/pkg/builtin/#string">string</a>  `json:&#34;requires&#34;`
+<span id="IndexData.Packages"></span>    Packages []<a href="#Package">Package</a> `json:&#34;packages&#34;`
+
+<span id="IndexData.Force"></span>    Force         <a href="/pkg/builtin/#bool">bool</a> `json:&#34;force&#34;`
+<span id="IndexData.ForceRequires"></span>    ForceRequires <a href="/pkg/builtin/#bool">bool</a> `json:&#34;force_requires&#34;`
+<span id="IndexData.ForceSettings"></span>    ForceSettings <a href="/pkg/builtin/#bool">bool</a> `json:&#34;force_settings&#34;`
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewFromProperties">func <a href="/src/github.com/jgsogo/jcli-conan-center/indexer/indexer.go?s=2619:2705#L71">NewFromProperties</a>
+					<a class="permalink" href="#NewFromProperties">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewFromProperties(ref <a href="/pkg/github.com/jgsogo/jcli-conan-center/types/">types</a>.<a href="/pkg/github.com/jgsogo/jcli-conan-center/types/#Reference">Reference</a>, props []<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/services/utils/">servicesUtils</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/services/utils/#Property">Property</a>) *<a href="#IndexData">IndexData</a></pre>
+				<p>
+NewFromProperties creates a `IndexData` and populates it with Artifactory properties
+</p>
+
+				
+				
+			
+
+			
+				
+				<h3 id="IndexData.SetForce">func (*IndexData) <a href="/src/github.com/jgsogo/jcli-conan-center/indexer/indexer.go?s=2406:2449#L64">SetForce</a>
+					<a class="permalink" href="#IndexData.SetForce">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (data *<a href="#IndexData">IndexData</a>) SetForce(value <a href="/pkg/builtin/#bool">bool</a>)</pre>
+				<p>
+SetForce sets the value of the `force` attribute and related ones.
+</p>
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Package">type <a href="/src/github.com/jgsogo/jcli-conan-center/indexer/indexer.go?s=330:647#L2">Package</a>
+				<a class="permalink" href="#Package">&#xb6;</a>
+				
+				
+			</h2>
+			<p>
+Package contains information about a single packageID inside the `IndexData`
+</p>
+
+			<pre>type Package struct {
+<span id="Package.PackageID"></span>    PackageID       <a href="/pkg/builtin/#string">string</a>            `json:&#34;package_id&#34;`
+<span id="Package.Version"></span>    Version         <a href="/pkg/builtin/#string">string</a>            `json:&#34;version&#34;`
+<span id="Package.PackageRevision"></span>    PackageRevision <a href="/pkg/builtin/#string">string</a>            `json:&#34;package_revision&#34;`
+<span id="Package.Settings"></span>    Settings        map[<a href="/pkg/builtin/#string">string</a>]<a href="/pkg/builtin/#string">string</a> `json:&#34;settings,omitempty&#34;`
+<span id="Package.Requires"></span>    Requires        []<a href="/pkg/builtin/#string">string</a>          `json:&#34;requires,omitempty&#34;`
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewPackageUsingProperties">func <a href="/src/github.com/jgsogo/jcli-conan-center/indexer/indexer.go?s=735:825#L11">NewPackageUsingProperties</a>
+					<a class="permalink" href="#NewPackageUsingProperties">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewPackageUsingProperties(pkg <a href="/pkg/github.com/jgsogo/jcli-conan-center/types/">types</a>.<a href="/pkg/github.com/jgsogo/jcli-conan-center/types/#Package">Package</a>, props []<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/services/utils/">servicesUtils</a>.<a href="/pkg/github.com/jfrog/jfrog-client-go/artifactory/services/utils/#Property">Property</a>) *<a href="#Package">Package</a></pre>
+				<p>
+NewPackageUsingProperties creates a `Package` instance and initializes its members
+</p>
+
+				
+				
+			
+
+			
+				
+				<h3 id="Package.AddSetting">func (*Package) <a href="/src/github.com/jgsogo/jcli-conan-center/indexer/indexer.go?s=1467:1523#L36">AddSetting</a>
+					<a class="permalink" href="#Package.AddSetting">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (pkg *<a href="#Package">Package</a>) AddSetting(key <a href="/pkg/builtin/#string">string</a>, value <a href="/pkg/builtin/#string">string</a>)</pre>
+				<p>
+AddSetting add the key-value pair for a settings, taking into account some key transformations.
+</p>
+
+				
+				
+				
+			
+		
+	
+
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.13.15.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="/LICENSE">BSD license</a>.<br>
+<a href="/doc/tos.html">Terms of Service</a> |
+<a href="http://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>
