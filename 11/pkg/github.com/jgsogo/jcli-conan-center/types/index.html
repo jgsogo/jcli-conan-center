@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>types - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="/jcli-conan-center/lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="/jcli-conan-center/lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.13.15";</script>
+<script src="/jcli-conan-center/lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="/pkg/">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="/pkg/">GoDoc</a></div>
+<a href="#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="/search">
+<div id="menu">
+
+<span class="search-box"><input type="search" id="search" name="q" placeholder="Search" aria-label="Search" required><button type="submit"><span><!-- magnifying glass: --><svg width="24" height="24" viewBox="0 0 24 24"><title>submit search</title><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span></button></span>
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package types
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "github.com/jgsogo/jcli-conan-center/types"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="#pkg-index" class="indexLink">Index</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				
+				
+			</div>
+		</div>
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+				<dd><a href="#pkg-constants">Constants</a></dd>
+			
+			
+			
+			
+				
+				<dd><a href="#ByTime">type ByTime</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#ByTime.Len">func (a ByTime) Len() int</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#ByTime.Less">func (a ByTime) Less(i, j int) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#ByTime.Swap">func (a ByTime) Swap(i, j int)</a></dd>
+				
+			
+				
+				<dd><a href="#Package">type Package</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Package.String">func (pkg *Package) String() string</a></dd>
+				
+			
+				
+				<dd><a href="#Reference">type Reference</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Reference.RtPath">func (ref *Reference) RtPath(withRevision bool) string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Reference.String">func (ref *Reference) String() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#Reference.ToString">func (ref *Reference) ToString(withRevision bool) string</a></dd>
+				
+			
+				
+				<dd><a href="#RtIndexJSON">type RtIndexJSON</a></dd>
+				
+				
+			
+				
+				<dd><a href="#RtRevisionsData">type RtRevisionsData</a></dd>
+				
+				
+			
+				
+				<dd><a href="#RtTimestamp">type RtTimestamp</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="#RtTimestamp.UnmarshalJSON">func (ct *RtTimestamp) UnmarshalJSON(b []byte) (err error)</a></dd>
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go">conan.go</a>
+			
+				<a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go">rt.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		
+
+		
+			<h2 id="pkg-constants">Constants</h2>
+			
+				
+				<pre>const (
+    <span id="ValidConanChars">ValidConanChars</span>       = `[a-zA-Z0-9_][a-zA-Z0-9_\+\.-]`
+    <span id="FilesystemPlaceHolder">FilesystemPlaceHolder</span> = &#34;_&#34;
+)</pre>
+			
+		
+		
+		
+		
+			
+			
+			<h2 id="ByTime">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=523:552#L22">ByTime</a>
+				<a class="permalink" href="#ByTime">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type ByTime []<a href="#RtRevisionsData">RtRevisionsData</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="ByTime.Len">func (ByTime) <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=554:579#L24">Len</a>
+					<a class="permalink" href="#ByTime.Len">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (a <a href="#ByTime">ByTime</a>) Len() <a href="/pkg/builtin/#int">int</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="ByTime.Less">func (ByTime) <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=672:707#L26">Less</a>
+					<a class="permalink" href="#ByTime.Less">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (a <a href="#ByTime">ByTime</a>) Less(i, j <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#bool">bool</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="ByTime.Swap">func (ByTime) <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=608:638#L25">Swap</a>
+					<a class="permalink" href="#ByTime.Swap">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (a <a href="#ByTime">ByTime</a>) Swap(i, j <a href="/pkg/builtin/#int">int</a>)</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Package">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=1378:1458#L58">Package</a>
+				<a class="permalink" href="#Package">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type Package struct {
+<span id="Package.Ref"></span>    Ref       <a href="#Reference">Reference</a>
+<span id="Package.PackageId"></span>    PackageId <a href="/pkg/builtin/#string">string</a>
+<span id="Package.Revision"></span>    Revision  <a href="/pkg/builtin/#string">string</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="Package.String">func (*Package) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=1460:1495#L64">String</a>
+					<a class="permalink" href="#Package.String">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (pkg *<a href="#Package">Package</a>) String() <a href="/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Reference">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=142:254#L3">Reference</a>
+				<a class="permalink" href="#Reference">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type Reference struct {
+<span id="Reference.Name"></span>    Name     <a href="/pkg/builtin/#string">string</a>
+<span id="Reference.Version"></span>    Version  <a href="/pkg/builtin/#string">string</a>
+<span id="Reference.User"></span>    User     *<a href="/pkg/builtin/#string">string</a>
+<span id="Reference.Channel"></span>    Channel  *<a href="/pkg/builtin/#string">string</a>
+<span id="Reference.Revision"></span>    Revision <a href="/pkg/builtin/#string">string</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="Reference.RtPath">func (*Reference) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=955:1009#L36">RtPath</a>
+					<a class="permalink" href="#Reference.RtPath">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (ref *<a href="#Reference">Reference</a>) RtPath(withRevision <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reference.String">func (*Reference) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=885:922#L32">String</a>
+					<a class="permalink" href="#Reference.String">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (ref *<a href="#Reference">Reference</a>) String() <a href="/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reference.ToString">func (*Reference) <a href="/src/github.com/jgsogo/jcli-conan-center/types/conan.go?s=570:626#L19">ToString</a>
+					<a class="permalink" href="#Reference.ToString">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (ref *<a href="#Reference">Reference</a>) ToString(withRevision <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="RtIndexJSON">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=753:829#L28">RtIndexJSON</a>
+				<a class="permalink" href="#RtIndexJSON">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type RtIndexJSON struct {
+    <span class="comment">//Reference string</span>
+<span id="RtIndexJSON.Revisions"></span>    Revisions []<a href="#RtRevisionsData">RtRevisionsData</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="RtRevisionsData">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=451:521#L17">RtRevisionsData</a>
+				<a class="permalink" href="#RtRevisionsData">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type RtRevisionsData struct {
+<span id="RtRevisionsData.Revision"></span>    Revision <a href="/pkg/builtin/#string">string</a>
+<span id="RtRevisionsData.Time"></span>    Time     <a href="#RtTimestamp">RtTimestamp</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="RtTimestamp">type <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=102:140#L2">RtTimestamp</a>
+				<a class="permalink" href="#RtTimestamp">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type RtTimestamp struct {
+    <a href="/pkg/time/">time</a>.<a href="/pkg/time/#Time">Time</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="RtTimestamp.UnmarshalJSON">func (*RtTimestamp) <a href="/src/github.com/jgsogo/jcli-conan-center/types/rt.go?s=142:200#L6">UnmarshalJSON</a>
+					<a class="permalink" href="#RtTimestamp.UnmarshalJSON">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (ct *<a href="#RtTimestamp">RtTimestamp</a>) UnmarshalJSON(b []<a href="/pkg/builtin/#byte">byte</a>) (err <a href="/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+		
+	
+
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.13.15.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="/LICENSE">BSD license</a>.<br>
+<a href="/doc/tos.html">Terms of Service</a> |
+<a href="http://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>
