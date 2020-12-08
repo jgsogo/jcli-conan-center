@@ -96,6 +96,9 @@ func TestNewFromProperties(t *testing.T) {
 	props = append(props, servicesUtils.Property{Key: "settings", Value: "arch"})
 	props = append(props, servicesUtils.Property{Key: "description", Value: "B2 makes it easy to build C++ projects, everywhere."})
 	props = append(props, servicesUtils.Property{Key: "user"})
+	props = append(props, servicesUtils.Property{Key: "license", Value: "MIT"})
+	props = append(props, servicesUtils.Property{Key: "homepage", Value: "https://homepage.url"})
+	props = append(props, servicesUtils.Property{Key: "url", Value: "https://url.url"})
 	props = append(props, servicesUtils.Property{Key: "deprecated"})
 	props = append(props, servicesUtils.Property{Key: "options", Value: "toolset"})
 
@@ -109,6 +112,7 @@ func TestNewFromProperties(t *testing.T) {
 	assert.Equal(t, "rrev", indexData.RecipeRevision)
 	assert.Equal(t, "topic1,topic2", indexData.Topics)
 	assert.Equal(t, "B2 makes it easy to build C++ projects, everywhere.", indexData.Description)
-	assert.Equal(t, "", indexData.Homepage)
-	assert.Equal(t, "", indexData.URL)
+	assert.Equal(t, "MIT", indexData.License)
+	assert.Equal(t, "https://homepage.url", indexData.Homepage)
+	assert.Equal(t, "https://url.url", indexData.URL)
 }
