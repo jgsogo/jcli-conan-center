@@ -49,3 +49,18 @@ func TestIndexData(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, `{"user":"user","channel":"channel","recipe_revision":"rrev","name":"name","version":"version","description":"the description","license":"license","homepage":"https://homepage.url","giturl":"url","topics":"t1,t2","requires":["r1"],"packages":[{"package_id":"pkgID","version":"version","package_revision":"prev","settings":{"compiler_version":"gcc","os":"Linux"},"requires":["r1"]}],"force":true,"force_requires":true,"force_settings":true}`, string(b))
 }
+
+func TestIndexDataEmptyFields(t *testing.T) {
+	data := IndexData{}
+	data.User = "user"
+	data.Channel = "channel"
+	data.RecipeRevision = "rrev"
+	data.Name = "name"
+	data.Version = "version"
+	data.Requires = append(data.Requires, "r1")
+	data.SetForce(true)
+
+	b, err := json.Marshal(data)
+	assert.Nil(t, err)
+	assert.Equal(t, `{"user":"user","channel":"channel","recipe_revision":"rrev","name":"name","version":"version","requires":["r1"],"packages":null,"force":true,"force_requires":true,"force_settings":true}`, string(b))
+}
