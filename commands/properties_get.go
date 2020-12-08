@@ -3,6 +3,7 @@ package commands
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 
 	"github.com/jfrog/jfrog-cli-core/artifactory/commands"
@@ -10,6 +11,7 @@ import (
 	"github.com/jfrog/jfrog-cli-core/plugins/components"
 	"github.com/jfrog/jfrog-client-go/utils/log"
 	"github.com/jgsogo/jcli-conan-center/search"
+	"github.com/jgsogo/jcli-conan-center/types"
 )
 
 // GetPropertiesGetCommand returns object description for the command 'properties'
@@ -34,11 +36,6 @@ func getPropertiesGetFlags() []components.Flag {
 			Description:  "Artifactory server ID configured using the config command. If not specified, the default configured Artifactory server is used.",
 			DefaultValue: "",
 		},
-		components.BoolFlag{
-			Name:         "only-latest",
-			Description:  "If specified, it will retrieve only the latest revision",
-			DefaultValue: true,
-		},
 	}
 }
 
@@ -50,13 +47,32 @@ func getPropertiesGetArguments() []components.Argument {
 		},
 		{
 			Name:        "reference",
-			Description: "Conan reference to work with",
+			Description: "Conan reference to work with (use v2 style, without trailing @). If no revision is given, it will use latest one",
 		},
 	}
 }
 
+func parseReference(reference string) types.Reference {
+	referencePattern := regexp.MustCompile(`(?P<name>` + types.ValidConanChars + `*)\/(?P<version>` + types.ValidConanChars + `+)(@(?P<user>` + types.ValidConanChars + `+)\/(?P<channel>` + types.ValidConanChars + `*))?(#(?P<revision>[a-z0-9]+))?`)
+	m := referencePattern.FindStringSubmatch(reference)
+	name := m[1]
+	version := m[2]
+	user := m[4]
+	channel := m[5]
+	revision := m[7]
+
+	if user == "" || channel == "" {
+		if channel != "" || user != "" {
+			panic("Provided reference contains 'channel' or 'user', but not both!")
+		}
+		return types.Reference{name, version, nil, nil, revision}
+	} else {
+		return types.Reference{name, version, &user, &channel, revision}
+	}
+}
+
 func propertiesGetCmd(c *components.Context) error {
-	if len(c.Arguments) != 1 {
+	if len(c.Arguments) != 2 {
 		return errors.New("Wrong number of arguments. Expected: 2, " + "Received: " + strconv.Itoa(len(c.Arguments)))
 	}
 
@@ -84,20 +100,23 @@ func propertiesGetCmd(c *components.Context) error {
 		return err
 	}
 
-	// Search
-	log.Info("Command properties-get -")
+	log.Info("Command properties-get")
 	reference := c.Arguments[1]
-	log.Info(fmt.Sprintf(" - reference: %s", reference))
-	references, err := search.SearchReferences(serviceManager, repository, reference, c.GetBoolFlagValue("only-latest"))
-	if err != nil {
-		return err
-	}
-	if len(references) > 0 {
-		//log.Output(fmt.Sprintf("Found %d references:", len(references)))
-		for _, ref := range references {
-			log.Output(ref.String())
+	log.Info(fmt.Sprintf(" - input reference: %s", reference))
+
+	// Search for the specific revision in the repository
+	rtReference := parseReference(reference)
+	if rtReference.Revision == "" { // Search for the latest revision
+		rtRevisions, err := search.ParseRevisions(serviceManager, repository+"/"+rtReference.RtPath(false)+"/index.json")
+		if err != nil {
+			return err
 		}
+		rtReference.Revision = rtRevisions[len(rtRevisions)-1].Revision
 	}
+	log.Info(" - working reference:", rtReference.ToString(true))
+
+	// Get properties for the given reference
+	
 
 	return nil
 }
