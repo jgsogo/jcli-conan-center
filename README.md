@@ -24,6 +24,12 @@ Installing a specific version:
 This plugin requires a valid authentication to Artifactory, use JFrog CLI as usual
 to provide credentials and configure the connection.
 
+Available commands:
+
+ * Search packages: `search [command options] <repo>`
+ * Get properties: `properties [command options] <repo> <reference>`
+ * Indexeer JSON call: `index-reference [command options] <repo> <reference>`
+
 **Note.-** Commands are documented using the plugin isolated, to use them within
 JFrog CLI just change the `go run main.go` with `jfrog conan-center` after installing
 it.
@@ -124,27 +130,181 @@ b2/4.2.0#efacbfac6ee3561ff07968a372b940af:4db1be536558d833e52e862fd84d64d75c2b36
 </details>
 
 
+## Get properties: `properties [command options] <repo> <reference>`
 
-### Commands
-* hello
-    - Arguments:
-        - addressee - The name of the person you would like to greet.
-    - Flags:
-        - shout: Makes output uppercase **[Default: false]**
-        - repeat: Greets multiple times **[Default: 1]**
-    - Example:
-    ```
-  $ jfrog hello-frog hello world --shout --repeat=2
-  
-  NEW GREETING: HELLO WORLD!
-  NEW GREETING: HELLO WORLD!
-  ```
+Returns the properties associated to a given Conan reference in a given Artifactory repository
 
-### Environment variables
-* HELLO_FROG_GREET_PREFIX - Adds a prefix to every greet **[Default: New greeting: ]**
+* Arguments:
+
+  * `repo`: Name of the Artifactory repository
+  * `reference`: Conan reference to work with (use v2 style, without trailing @).
+    If no revision is given, it will use latest one
+
+* Flags:
+
+  * `--server-id` [Optional]: Artifactory server ID configured using the config
+    command. If not specified, the default configured Artifactory server is used.
+  * `--packages` [Default: `false`]: If specified, it will retrieve properties
+    from packages as well.
+
+<details><summary>Example: Return properties for a given reference</summary>
+<p>
+
+```
+$> go run main.go properties conan-center b2/4.3.0#ec8af29b790f5745890470ce4220ed50
+
+Reference 'b2/4.3.0#ec8af29b790f5745890470ce4220ed50':
+  topics: conan
+  topics: builder
+  settings: os
+  url: https://github.com/conan-io/conan-center-index
+  options: use_cxx_env
+  license: BSL-1.0
+  settings: arch
+  topics: boost
+  version: 4.3.0
+  deprecated: 
+  options: toolset
+  name: b2
+  channel: 
+  description: B2 makes it easy to build C++ projects, everywhere.
+  topics: installer
+  homepage: https://boostorg.github.io/build/
+  user:
+```
+</p>
+</details>
+
+<details><summary>Example: Return properties for a reference (latest revision)
+and all the packages associated to it</summary>
+<p>
+
+```
+$> go run main.go properties conan-center b2/4.3.0 --packages
+
+Reference 'b2/4.3.0#ec8af29b790f5745890470ce4220ed50':
+  topics: conan
+  topics: builder
+  settings: os
+  url: https://github.com/conan-io/conan-center-index
+  options: use_cxx_env
+  license: BSL-1.0
+  settings: arch
+  topics: boost
+  version: 4.3.0
+  deprecated: 
+  options: toolset
+  name: b2
+  channel: 
+  description: B2 makes it easy to build C++ projects, everywhere.
+  topics: installer
+  homepage: https://boostorg.github.io/build/
+  user: 
+Package 'b2/4.3.0#ec8af29b790f5745890470ce4220ed50:46f53f156846659bf39ad6675fa0ee8156e859fe#91521b313ac2e32c6306677464116901':
+  settings: build_type=Release
+  topics: conan
+  ...
+Package 'b2/4.3.0#ec8af29b790f5745890470ce4220ed50:4db1be536558d833e52e862fd84d64d75c2b3656#675b3df28a8ad03689634e1b4f46187f':
+  topics: boost
+  settings: os=Linux
+  ...
+```
+</p>
+</details>
+
+
+## Indexeer JSON call: `index-reference [command options] <repo> <reference>`
+
+Returns the properties associated to a given Conan reference in a given Artifactory repository
+
+* Arguments:
+
+  * `repo`: Name of the Artifactory repository
+  * `reference`: Conan reference to work with (use v2 style, without trailing @).
+    If no revision is given, it will use latest one.
+
+* Flags:
+
+  * `--server-id` [Optional]: Artifactory server ID configured using the config
+    command. If not specified, the default configured Artifactory server is used.
+  * `--force` [Default: `false`]: Value for argument `force` in the indexer call.
+
+<details><summary>Example: Indexer call for a reference</summary>
+<p>
+
+```json
+$> go run main.go index-reference conan-center b2/4.3.0 --force
+
+{
+        "user": "",
+        "channel": "",
+        "recipe_revision": "ec8af29b790f5745890470ce4220ed50",
+        "name": "b2",
+        "version": "4.3.0",
+        "description": "B2 makes it easy to build C++ projects, everywhere.",
+        "license": "BSL-1.0",
+        "homepage": "https://boostorg.github.io/build/",
+        "giturl": "https://github.com/conan-io/conan-center-index",
+        "topics": "conan,builder,boost,installer",
+        "requires": null,
+        "packages": [
+                {
+                        "package_id": "46f53f156846659bf39ad6675fa0ee8156e859fe",
+                        "version": "4.3.0",
+                        "package_revision": "91521b313ac2e32c6306677464116901",
+                        "settings": {
+                                "arch": "x86_64",
+                                "arch_build": "x86_64",
+                                "build_type": "Release",
+                                "compiler": "apple-clang",
+                                "compiler_libcxx": "libc++",
+                                "compiler_version": "10.0",
+                                "os": "Macos",
+                                "os_build": "Macos"
+                        }
+                },
+                {
+                        "package_id": "4db1be536558d833e52e862fd84d64d75c2b3656",
+                        "version": "4.3.0",
+                        "package_revision": "675b3df28a8ad03689634e1b4f46187f",
+                        "settings": {
+                                "arch": "x86_64",
+                                "arch_build": "x86_64",
+                                "build_type": "Release",
+                                "compiler": "gcc",
+                                "compiler_libcxx": "libstdc++",
+                                "compiler_version": "4.9",
+                                "os": "Linux",
+                                "os_build": "Linux"
+                        }
+                },
+                {
+                        "package_id": "ca33edce272a279b24f87dc0d4cf5bbdcffbc187",
+                        "version": "4.3.0",
+                        "package_revision": "2904158bb9b96db13de732f1c8ca4b64",
+                        "settings": {
+                                "arch": "x86_64",
+                                "arch_build": "x86_64",
+                                "build_type": "Release",
+                                "compiler": "Visual Studio",
+                                "compiler_runtime": "MT",
+                                "compiler_version": "14",
+                                "os": "Windows",
+                                "os_build": "Windows"
+                        }
+                }
+        ],
+        "force": true,
+        "force_requires": true,
+        "force_settings": true
+}
+```
+</p>
+</details>
+
 
 ## Additional info
-None.
+Work in progress.
 
 ## Release Notes
 The release notes are available [here](RELEASE.md).
